@@ -13,6 +13,7 @@ nbproject/
 .buildpath
 .project
 .settings/
+.externalToolBuilders/
 
 # envvars
 bin/envvars
