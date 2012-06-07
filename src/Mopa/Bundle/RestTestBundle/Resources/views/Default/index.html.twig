@@ -1,0 +1,47 @@
+{% extends 'MopaRestTestBundle::layout.html.twig' %}
+{% from 'MopaBootstrapBundle::flash.html.twig' import flash %}
+
+{% block page_header %}
+<h1>Mopa Rest Test</h1>
+{% endblock page_header %}
+
+{% block content %}
+<div class="span4">
+    <form class="form-horizontal" action="{{ path('mopa_rest_test') }}" method="POST">
+        {{ form_widget(form) }}
+        <div class="form-actions">
+            <input type="submit" class="btn btn-primary" value="Test">
+        </div>
+    </form>
+</div>
+{% if response %}
+<div class="span8">
+    <h1>Response:</h1>
+    {% if response.ok == false %}
+    {{ flash('error', response.reasonPhrase) }}
+    {% endif %}
+    <table>
+        <tr>
+            <td>Status Code</td>
+            <td>{{ response.statusCode }}</td>
+        </tr>
+        <tr>
+            <td>Headers</td>
+            <td>
+                <ul>
+                    {% for header in response.headers %}
+                        <li>{{ header }}</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+        <tr>
+            <td>Content:</td>
+            <td>
+                {{ response.content|raw }}
+            </td>
+        </tr>
+    </table>
+</div>
+{% endif %}
+{% endblock content %}

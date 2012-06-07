@@ -1,0 +1,15 @@
+{% extends "MopaBootstrapBundle::base.html.twig" %}
+
+{% block title %}Mopa Rest Test{% endblock title %}
+
+{% block head_style %}
+{% stylesheets
+       '@MopaRestTestBundle/Resources/public/less/moparesttestbundle.less'
+%}
+<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
+{% endstylesheets %}
+{% endblock head_style %}
+
+{% block navbar %}
+{{ mopa_bootstrap_navbar('frontendRestTestNavbar') }}
+{% endblock navbar %}
