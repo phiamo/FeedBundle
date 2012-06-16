@@ -42,7 +42,7 @@ class RestTestFormType extends AbstractType
         ))
         ->add('authType', 'choice', array(
             'choices' => array(
-                 null  => 'No Auth',
+                'none'  => 'No Auth',
                 'wsse'  => 'WSSE',
                 'BasicAuth' => 'BasicAuth'
             )

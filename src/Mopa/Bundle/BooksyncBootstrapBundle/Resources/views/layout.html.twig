@@ -1,31 +1,4 @@
-{% extends "MopaBootstrapBundle::base.html.twig" %}
-
-{% block head_style %}
-{% stylesheets
-       '@MopaBooksyncBundle/Resources/public/less/mopabooksyncbundle.less'
-%}
-<link href="{{ asset_url }}" type="text/css" rel="stylesheet" media="screen" />
-{% endstylesheets %}
-{% endblock head_style %}
-
-{% block shubber %}
-            {% if is_granted("IS_AUTHENTICATED_REMEMBERED") %}
-                {{ 'layout.logged_in_as'|trans({'%username%': app.user.username}, 'FOSUserBundle') }} |
-                <a href="{{ path('fos_user_security_logout') }}">
-                    {{ 'layout.logout'|trans({}, 'FOSUserBundle') }}
-                </a>
-            {% else %}
-                <a href="{{ path('fos_user_security_login') }}">{{ 'layout.login'|trans({}, 'FOSUserBundle') }}</a>
-            {% endif %}
-        </div>
-
-        {% for key, message in app.session.getFlashes() %}
-        <div class="{{ key }}">
-            {{ message|trans({}, 'FOSUserBundle') }}
-        </div>
-        {% endfor %}
-{% endblock %}
-
+{% extends "MopaBooksyncBundle::layout_without_menu.html.twig" %}
 
 {% block content %}
 	{% block fos_user_content %}
