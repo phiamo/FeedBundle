@@ -23,6 +23,7 @@ app/logs/*
 vendor/
 web/bundles/
 app/config/parameters.ini
+app/config/parameters.yml
 web/css/*
 web/js/*
 web/media/*
