@@ -1,0 +1,4 @@
+Fos user registration form: Register
+invitation.successful: You will recieve an invite as soon as possible
+invitation.unsuccessful: You are already registered
+register.invitation.text: Booksync is in an early alpha stage, so you need an invitation to register. Please keep in mind that we try to preserve all data you enter, but atm can not insure it.

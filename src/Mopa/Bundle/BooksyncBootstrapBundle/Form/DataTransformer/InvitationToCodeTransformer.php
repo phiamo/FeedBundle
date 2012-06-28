@@ -1,6 +1,7 @@
 <?php
 namespace Mopa\Bundle\BooksyncBootstrapBundle\Form\DataTransformer;
 
+use Doctrine\ORM\NoResultException;
 use Mopa\Bundle\BooksyncBundle\Entity\Invitation;
 use Doctrine\ORM\EntityManager;
 use Symfony\Component\Form\DataTransformerInterface;
@@ -41,11 +42,21 @@ class InvitationToCodeTransformer implements DataTransformerInterface
             throw new UnexpectedTypeException($value, 'string');
         }
 
-        return $this->entityManager
-            ->getRepository('Mopa\Bundle\BooksyncBundle\Entity\Invitation')
-            ->findOneBy(array(
-                'code' => $value,
-                'user' => null,
-            ));
+        try{
+            $invitation = $this->entityManager
+                ->getRepository('Mopa\Bundle\BooksyncBundle\Entity\Invitation')
+                ->createQueryBuilder("i")
+                ->leftJoin('i.user', 'u')
+                ->where("i.code = :value")
+                ->setParameter('value', $value)
+                ->andWhere("u IS NULL")
+                ->getQuery()
+                ->getSingleResult()
+            ;
+        }
+        catch(NoResultException $e){
+            return null;
+        }
+        return $invitation;
     }
 }
