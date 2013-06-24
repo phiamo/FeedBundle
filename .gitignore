@@ -1,38 +1,43 @@
+/web/bundles/
+/web/media/
+/app/bootstrap.php.cache
+/app/cache/*
+/app/logs/*
+/build/
+/vendor/
+/bin/
+/composer.phar
+
+
 ## generic files to ignore
 *~
 *.lock
 *.DS_Store
 *.swp
 *.out
-.tags*
 
 ## IDE files to ignore
+bootstrap.sublime-workspace
 nbproject/
 .idea/
 *.tmproj
 .buildpath
 .project
 .settings/
-.externalToolBuilders/
 
 # envvars
 bin/envvars
 
-app/cache/*
-app/logs/*
-vendor/
-web/bundles/
-app/config/parameters.ini
-app/config/parameters.yml
-web/css/*
-web/js/*
-web/media/*
-src/Mopa/BootstrapBundle
-
-
 # to have the possibility to have an own htaccess e.g. with protection (as on prod)
 web/.htaccess
 
+# ignore compiled files (see config.yml assetic: read_from)
+web/compiled/
 
-# ignore paypal so everone can have its own
-app/config/paypal.yml
+# ignore parameters so everone can have its own
+app/config/parameters.yml
+
+# ignore MopaRemoteUpdateBundle bin files
+bin/post-composer.sh
+bin/envvars.default
+app/Resources/mopa_remote_update.sqlite
