@@ -25,7 +25,7 @@ class DefaultController extends Controller
         $form = $this->createForm(new RestTestFormType());
         $parameters = array();
         if ($request->getMethod() === 'POST') {
-            $form->bindRequest($request);
+            $form->bind($request);
             if ($form->isValid()) {
                 $values = $form->getData();
                 $headers = array();

@@ -18,10 +18,8 @@
             </div>
         </div>
         <input type="hidden" name="_csrf_token" value="{{ csrf_token }}" />
-        <div class="form-actions">
+        <div class="form-actions" style="text-align: center">
             <input class="btn btn-primary" type="submit" id="_submit" name="_submit" value="{{ 'security.login.submit'|trans({}, 'FOSUserBundle') }}" />
-        </div>
-        <div class="form-actions">
             {{ facebook_login_button({'autologoutlink': true}) }}
             <a class="btn" href="{{ path ('connect_twitter')}}">Login Via twitter</a>
             </div>
