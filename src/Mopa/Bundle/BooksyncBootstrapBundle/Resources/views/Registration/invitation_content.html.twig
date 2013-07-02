@@ -1,0 +1,6 @@
+<form class="form-inline" action="{{ path('mopa_booksync_email_register') }}" {{ form_enctype(form_invitation) }} method="POST" class="fos_user_registration_register">
+    {{ form_widget(form_invitation, {'render_fieldset': false, 'label': 'Sign up'}) }}
+    <div class="form-actions" style="text-align: center">
+            <input class="btn btn-primary" type="submit" id="_submit" name="_submit" value="{{ 'registration.invitation.request'|trans({}, 'FOSUserBundle') }}" />
+    </div>
+</form>

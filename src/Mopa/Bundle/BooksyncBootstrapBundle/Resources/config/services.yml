@@ -18,4 +18,8 @@ services:
     mopa_booksync.invitation.form.data_transformer:
         class: Mopa\Bundle\BooksyncBootstrapBundle\Form\DataTransformer\InvitationToCodeTransformer
         arguments: [@doctrine.orm.entity_manager]
-            
+
+    mopa_booksync.invitation.service:
+        class: Mopa\Bundle\BooksyncBootstrapBundle\Invitation\InvitationService
+        arguments: [@form.factory, @doctrine.orm.entity_manager]
+        

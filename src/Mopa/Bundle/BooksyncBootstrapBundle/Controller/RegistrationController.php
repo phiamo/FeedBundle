@@ -17,10 +17,8 @@ use Symfony\Component\Routing\Router;
 
 use Symfony\Component\HttpFoundation\Session\Session;
 
-use Mopa\Bundle\BooksyncBundle\Entity\Invitation;
-
 use Mopa\Bundle\BooksyncBootstrapBundle\Form\Type\InvitationRegisterFormType;
-
+use Mopa\Bundle\BooksyncBundle\Entity\Invitation;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -56,15 +54,12 @@ class RegistrationController extends BaseController
                 $route = 'fos_user_registration_confirmed';
             }
 
-            $this->setFlash('fos_user_success', 'registration.flash.user_created');
+            $this->session->getFlashBag()->add('fos_user_success', 'registration.flash.user_created');
             $url = $this->container->get('router')->generate($route);
 
             return new RedirectResponse($url);
         }
-
-        $invitation = new Invitation();
-        $form_invitation = $this->container->get('form.factory')->create(new InvitationRegisterFormType(), $invitation);
-
+        $form_invitation = $this->container->get('mopa_booksync.invitation.service')->getForm();
         return $this->container->get('templating')->renderResponse('FOSUserBundle:Registration:register.html.'.$this->getEngine(), array(
             'form' => $form->createView(),
             'form_invitation' => $form_invitation->createView(),
@@ -72,28 +67,14 @@ class RegistrationController extends BaseController
     }
     public function invitationAction(Request $request)
     {
-        $invitation = new Invitation();
-        $form = $this->container->get('form.factory')->create(new InvitationRegisterFormType(), $invitation);
-        if ($request->getMethod() == 'POST') {
-            $form->bindRequest($request);
-
-            if ($form->isValid()) {
-                $em = $this->container->get('doctrine.orm.entity_manager');
-                $em->persist($invitation);
-                try{
-                    $em->flush();
-                    $this->container->get('session')->setFlash('success', 'invitation.successful');
-                }
-                catch(\PDOException $e){
-                    $this->container->get('session')->setFlash('error', 'invitation.unsuccessful');
-                }
-                return new RedirectResponse($this->container->get('router')->generate('fos_user_registration_register'));
-            }
+        if(!$this->container->get('mopa_booksync.invitation.service')->processForm($request)) {
+            $this->container->get('session')->getFlashBag()->add('error', 'invitation.unsuccessful');
+            return new RedirectResponse($this->container->get('router')->generate('mopa_booksync_welcome'));
         }
+        $form_invitation = $this->container->get('mopa_booksync.invitation.service')->getForm();
 
-        return $this->container->get('templating')->renderResponse('FOSUserBundle:Registration:register.html.'.$this->getEngine(), array(
-            'form_invitation' => $form->createView(),
-        ));
+        $this->container->get('session')->getFlashBag()->add('success', 'invitation.successful');
+        return new RedirectResponse($this->container->get('router')->generate('mopa_booksync_welcome'));
     }
 
 }

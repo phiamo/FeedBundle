@@ -32,6 +32,6 @@ class InvitationRegisterFormType extends AbstractType
 
     public function getName()
     {
-        return 'invitation_registration';
+        return 'mopa_booksync_invitation_register_type';
     }
 }

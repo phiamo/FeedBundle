@@ -19,7 +19,7 @@ class InvitationFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->prependClientTransformer($this->invitationTransformer);
+        $builder->addViewTransformer($this->invitationTransformer, true);
     }
 
     public function getDefaultOptions()
@@ -37,6 +37,6 @@ class InvitationFormType extends AbstractType
 
     public function getName()
     {
-        return 'invitation';
+        return 'mopa_booksync_invitation_type';
     }
 }

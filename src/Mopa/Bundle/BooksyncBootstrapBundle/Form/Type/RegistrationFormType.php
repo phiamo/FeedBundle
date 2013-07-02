@@ -14,4 +14,8 @@ class RegistrationFormType extends BaseRegistrationFormType
 
         $builder->add('invitation', 'mopa_booksync_invitation_type');
     }
+    public function getName()
+    {
+        return 'mopa_booksync_user_registration';
+    }
 }
