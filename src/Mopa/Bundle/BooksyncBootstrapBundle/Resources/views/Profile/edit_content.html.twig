@@ -1,4 +1,3 @@
-
 <form class="form-horizontal" action="{{ path('fos_user_profile_edit', {'username': app.user.username}) }}" {{ form_enctype(form) }} method="POST" class="fos_user_profile_edit">
     {{ form_widget(form, {'show_child_label': false}) }}
     <div class="form-actions">

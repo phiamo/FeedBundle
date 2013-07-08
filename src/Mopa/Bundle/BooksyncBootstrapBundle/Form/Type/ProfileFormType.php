@@ -4,6 +4,8 @@ namespace Mopa\Bundle\BooksyncBootstrapBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
 use FOS\UserBundle\Form\Type\ProfileFormType as BaseType;
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormBuilder;
 
 class ProfileFormType extends BaseType
 {
@@ -16,23 +18,12 @@ class ProfileFormType extends BaseType
     {
         $this->class = $class;
     }
-    public function buildForm(FormBuilderInterface $builder, array $options)
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        parent::buildForm($builder, $options);
-
-        $builder->remove('user');
-        $child = $builder->create('user', 'form', array(
-                'data_class' => $this->class,
-                'widget_control_group' => false
-            ))
-        ;
-        $this->buildUserForm($child, $options);
-        $builder
-            ->add($child)
-
-        ;
+        $resolver->setDefaults(array(
+            'data_class' => $this->class,
+        ));
     }
-
     /**
      * Builds the embedded form representing the user.
      *
@@ -50,6 +41,6 @@ class ProfileFormType extends BaseType
     }
     public function getName()
     {
-        return 'mopa_booksync_profile';
+        return 'mopa_booksync_user_profile';
     }
 }

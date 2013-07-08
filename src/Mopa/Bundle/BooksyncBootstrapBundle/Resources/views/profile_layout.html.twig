@@ -1,0 +1,54 @@
+{% extends "MopaBooksyncBundle::base.html.twig" %}
+{% from 'MopaBootstrapBundle::flash.html.twig' import session_flash %}
+{% from 'MopaBooksyncBundle::macros.html.twig' import follow_user_btn %}
+
+{% block headline %}{{ user.username }}'s profile{% endblock headline %}
+
+{% block page_header %}
+<div class="page-header">
+      <div class="row">
+          <div class="span10">
+              <h1>{{ block('headline') }}</h1>
+              <p>{{ user.description }}</p>
+          </div>
+          {% block profile_edit_button %}{% endblock %}
+      </div>
+</div>
+{% endblock page_header %}
+
+{% block content_row %}
+<div class="row">
+    <div class="span3">
+        {% block left_sidebar %}
+    <div class="well">
+            {{ knp_menu_render('mopa_booksync.profile_menu', {'currentClass': 'active'}) }}
+        </div>
+        {% endblock left_sidebar %}
+    </div>
+
+    {% block flashes %}
+    {{ session_flash(false, 'span9') }}
+    {% endblock flashes %}
+
+{% block content %}
+    <div class="span9">
+    <ul class="nav nav-tabs" id="myTab">
+      <li class="active"><a href="#home">Home</a></li>
+      <li><a href="#profile">Profile</a></li>
+      <li><a href="#messages">Messages</a></li>
+      <li><a href="#settings">Settings</a></li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane active" id="home">...</div>
+      <div class="tab-pane" id="profile">...</div>
+      <div class="tab-pane" id="messages">...</div>
+      <div class="tab-pane" id="settings">...</div>
+    </div>
+
+	{% block fos_user_content %}
+	{% endblock fos_user_content %}
+	</div>
+{% endblock content %}
+</div><!--/row-->
+{% endblock content_row %}
