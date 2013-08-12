@@ -1,9 +1,0 @@
-services:
-    mopa_resttestsync.navbar:
-        class: %mopa_bootstrap.navbar.generic%
-        arguments:
-            - { }
-            - { }
-            - { title: "Rest Test Tool", fixedTop: true, titleRoute: "mopa_rest_test", isFluid: true }
-        tags:
-            - { name: mopa_bootstrap.navbar, alias: frontendRestTestNavbar } # The alias is what is used to retrieve the navbar
