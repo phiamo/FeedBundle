@@ -1,0 +1,3 @@
+mopa_booksync_admin_homepage:
+    pattern:  /hello/{name}
+    defaults: { _controller: MopaBooksyncAdminBundle:Default:index }
