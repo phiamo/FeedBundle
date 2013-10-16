@@ -76,7 +76,7 @@ class RestUsersFollowController extends BaseController
         ;
         //Using event system to tell doctrine deleting cache entries based on events like this
 
-        $followingQuery = $this->getDecoratedQuery($qb, 10, 0);
+        $followingQuery = $this->getDecoratedQuery($qb);
         $followingQuery->getQueryCacheDriver()->delete('followedBookmarks.'.$this->getUser()->getId());
         */
         $this->getUserManager()->updateUser($this->getUser());

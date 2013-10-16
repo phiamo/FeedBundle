@@ -1,7 +1,0 @@
-parameters:
-#    mopa_booksync_admin.example.class: Mopa\Bundle\BooksyncAdminBundle\Example
-
-services:
-#    mopa_booksync_admin.example:
-#        class: %mopa_booksync_admin.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
