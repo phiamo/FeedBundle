@@ -1,0 +1,3 @@
+mopa_feed_homepage:
+    path:     /hello/{name}
+    defaults: { _controller: MopaFeedBundle:Default:index }
