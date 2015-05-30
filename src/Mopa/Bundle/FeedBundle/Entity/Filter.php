@@ -8,9 +8,9 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * FeedFilter
  *
+ * @ORM\Table(name="mopa_feed_filter")
  * @ORM\Entity
- * @ORM\InheritanceType("SINGLE_TABLE")
- * @ORM\DiscriminatorColumn(name="discr", type="string")
+ * @ORM\InheritanceType("JOINED")
  */
 class Filter
 {
@@ -32,6 +32,13 @@ class Filter
      * @ORM\Column(type="boolean")
      */
     protected $active = false;
+
+    /**
+     * @var bool
+     *
+     * @ORM\Column(type="boolean")
+     */
+    protected $hideTags = false;
 
     /**
      * @var int
