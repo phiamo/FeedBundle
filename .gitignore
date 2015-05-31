@@ -8,6 +8,7 @@
 /build/
 /vendor/
 /composer.phar
+/backups
 
 
 ## generic files to ignore
