@@ -2,11 +2,10 @@
 
 namespace Mopa\Bundle\FeedBundle\Form;
 
-
 use Symfony\Component\Form\AbstractType;
 
-class FilterRuleType extends AbstractType {
-
+class FilterRuleType extends AbstractType
+{
     /**
      * Returns the name of this type.
      *
