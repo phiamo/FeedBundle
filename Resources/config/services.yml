@@ -1,9 +1,10 @@
 parameters:
-#    mopa_feed.example.class: Mopa\Bundle\FeedBundle\Example
+    mopa_feed.message_helper.class: Mopa\Bundle\FeedBundle\Model\MessageHelper
+    mopa_feed.message_manager.class: Mopa\Bundle\FeedBundle\Model\MessageManager
 
 services:
     mopa_feed.message_manager:
-        class: Mopa\Bundle\FeedBundle\Model\MessageManager
+        class: %mopa_feed.message_manager.class%
         arguments:
             - @old_sound_rabbit_mq.websockets_producer
             - @doctrine.orm.entity_manager
@@ -15,3 +16,4 @@ services:
         class: %mopa_feed.message_helper.class%
         arguments:
             - @service_container
+            - %mopa_feed.message.template_prefix%

@@ -26,10 +26,10 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->root('mopa_feed');
         $rootNode
             ->children()
-                ->scalarNode('message_helper')
+                ->scalarNode('message_class')
                     ->isRequired()
                 ->end()
-                ->scalarNode('message_class')
+                ->scalarNode('message_template_prefix')
                     ->isRequired()
                 ->end()
             ->end()

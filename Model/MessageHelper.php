@@ -17,7 +17,7 @@ use Mopa\Bundle\BooksyncBundle\WebSocket\Server\Connection;
  * Class MessageHelper
  * @package Mopa\Bundle\FeedBundle\Model
  */
-abstract class MessageHelper
+class MessageHelper
 {
     /**
      * @var array
@@ -26,17 +26,25 @@ abstract class MessageHelper
         'txt',
         'html'
     ];
+
     /**
      * @var ContainerInterface
      */
     private $container;
 
     /**
-     * @param ContainerInterface $container
+     * @var string
      */
-    public function __construct(ContainerInterface $container)
+    private $templatePrefix;
+
+    /**
+     * @param ContainerInterface $container
+     * @param $templatePrefix
+     */
+    public function __construct(ContainerInterface $container, $templatePrefix)
     {
         $this->container = $container;
+        $this->templatePrefix = $templatePrefix;
     }
 
     /**
@@ -94,11 +102,11 @@ abstract class MessageHelper
             $partData = [];
 
             foreach ($parts as $part) {
-                $template = $this->getTemplatePrefix($message) . $message->getEvent() . "." . $part . "." . $format . '.twig';
+                $template = $this->templatePrefix . $message->getEvent() . "." . $part . "." . $format . '.twig';
                 $partData[$part] = $this->container->get('templating')->render($template, ["msg" => $message]);
             }
 
-            $partData["item"] = $this->container->get('templating')->render($this->getTemplatePrefix($message) . "message_item.html.twig", ["msg" => $message]);
+            $partData["item"] = $this->container->get('templating')->render($this->templatePrefix . "message_item.html.twig", ["msg" => $message]);
 
             $data[$format] = $partData;
         }
@@ -107,10 +115,4 @@ abstract class MessageHelper
 
         return $message;
     }
-
-    /**
-     * @param Message $message
-     * @return string
-     */
-    abstract protected function getTemplatePrefix(Message $message);
 }
