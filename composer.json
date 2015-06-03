@@ -5,20 +5,18 @@
     "licence": "commercial",
 	"version" : "master",
 	"authors" : [{
-			"name" : "Philipp A. Mohrenweiser",
-			"email" : "phiamo@googlemail.com"
-		}
+        "name" : "Philipp A. Mohrenweiser",
+        "email" : "phiamo@googlemail.com"
+      }
 	],
-    "require": {
-      "oldsound/rabbitmq-bundle": "1.2.*"
-    },
 	"autoload" : {
-		"psr-0" : {
-			"Mopa\\Bundle\\FeedBundle" : ""
-		}
+      "psr-0" : {
+        "Mopa\\Bundle\\FeedBundle" : ""
+      }
 	},
 	"target-dir" : "Mopa/Bundle/FeedBundle",
 	"require" : {
-		"php" : ">=5.3.2"
+      "php" : ">=5.3.2",
+      "oldsound/rabbitmq-bundle": "1.2.*"
 	}
 }
