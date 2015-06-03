@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * Copyright 2015 Philipp A. Mohrenweiser <phiamo@gmail.com>
+ * All rights reserved
+ */
+
 namespace Mopa\Bundle\FeedBundle\DependencyInjection;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -24,5 +29,8 @@ class MopaFeedExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        $container->setParameter('mopa_feed.message_helper.class', $config['message_helper']);
+        $container->setParameter('mopa_feed.message.class', $config['message_class']);
     }
 }

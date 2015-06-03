@@ -2,6 +2,16 @@ parameters:
 #    mopa_feed.example.class: Mopa\Bundle\FeedBundle\Example
 
 services:
-#    mopa_feed.example:
-#        class: %mopa_feed.example.class%
-#        arguments: [@service_id, "plain_value", %parameter%]
+    mopa_feed.message_manager:
+        class: Mopa\Bundle\FeedBundle\Model\MessageManager
+        arguments:
+            - @old_sound_rabbit_mq.websockets_producer
+            - @doctrine.orm.entity_manager
+            - @jms_serializer
+            - @mopa_feed.message_helper
+            - %mopa_feed.message.class%
+
+    mopa_feed.message_helper:
+        class: %mopa_feed.message_helper.class%
+        arguments:
+            - @service_container

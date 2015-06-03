@@ -1,0 +1,21 @@
+{
+	"name" : "mopa/feed-bundle",
+	"type" : "symfony-bundle",
+	"description" : "Feed functionality",
+    "licence": "commercial",
+	"version" : "master",
+	"authors" : [{
+			"name" : "Philipp A. Mohrenweiser",
+			"email" : "phiamo@googlemail.com"
+		}
+	],
+	"autoload" : {
+		"psr-0" : {
+			"Mopa\\Bundle\\FeedBundle" : ""
+		}
+	},
+	"target-dir" : "Mopa/Bundle/FeedBundle",
+	"require" : {
+		"php" : ">=5.3.2"
+	}
+}

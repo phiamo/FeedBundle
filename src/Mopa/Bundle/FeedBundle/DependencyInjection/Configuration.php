@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * Copyright 2015 Philipp A. Mohrenweiser <phiamo@gmail.com>
+ * All rights reserved
+ */
+
 namespace Mopa\Bundle\FeedBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -19,7 +24,16 @@ class Configuration implements ConfigurationInterface
     {
         $treeBuilder = new TreeBuilder();
         $rootNode = $treeBuilder->root('mopa_feed');
-
+        $rootNode
+            ->children()
+                ->scalarNode('message_helper')
+                    ->isRequired()
+                ->end()
+                ->scalarNode('message_class')
+                    ->isRequired()
+                ->end()
+            ->end()
+        ;
         // Here you should define the parameters that are allowed to
         // configure your bundle. See the documentation linked above for
         // more information on that topic.

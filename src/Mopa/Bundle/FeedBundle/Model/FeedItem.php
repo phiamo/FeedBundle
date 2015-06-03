@@ -1,0 +1,261 @@
+<?php
+
+/*
+ * Copyright 2015 Philipp A. Mohrenweiser <phiamo@gmail.com>
+ * All rights reserved
+ */
+
+namespace Mopa\Bundle\FeedBundle\Model;
+
+use FOS\UserBundle\Model\UserInterface;
+use Gedmo\Mapping\Annotation as Gedmo;
+
+/**
+ * Class FeedItem
+ * @package Mopa\Bundle\FeedBundle\Model
+ */
+abstract class FeedItem implements MessageableInterface
+{
+    /**
+     * Class to use for messaging
+     *
+     * @var string
+     */
+    protected static $messageClass = 'Mopa\Bundle\FeedBundle\Model\Message';
+
+    /**
+     * @var int
+     */
+    protected $id;
+
+    /**
+     * @var $owner UserInterface
+     */
+    protected $owner;
+
+    /**
+     * @var $emitter UserInterface
+     */
+    protected $emitter;
+
+    /**
+     * @var \DateTime
+     *
+     * @Gedmo\Timestampable(on="create")
+     */
+    protected $created;
+
+    /**
+     * @var \DateTime
+     *
+     * @Gedmo\Timestampable(on="create")
+     * Only update on create automatically, otherwise this will lead to unexpected results on setting e.g. readat or adding a message
+     */
+    protected $updated;
+
+    /**
+     * When a Feeditem was published it gets a message, feedItems not having a message will not be displayed
+     * See BookmarkImport, its async and cant be displayed until the message is added
+     *
+     * @var $message Message
+     */
+    protected $message;
+
+    /**
+     * @var \DateTime
+     */
+    protected $readAt;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * Set owner
+     *
+     * @param UserInterface $owner
+     * @return $this
+     */
+    public function setOwner(UserInterface $owner = null)
+    {
+        $this->owner = $owner;
+    }
+
+    /**
+     * Get Owner
+     *
+     * @return UserInterface
+     */
+    public function getOwner()
+    {
+        return $this->owner;
+    }
+
+    /**
+     * Set readAt
+     *
+     * @param \DateTime $readAt
+     * @return $this
+     */
+    public function setReadAt(\DateTime $readAt)
+    {
+        $this->readAt = $readAt;
+    }
+
+    /**
+     * Set readAt
+     *
+     * @return $this
+     */
+    public function setRead()
+    {
+        $this->readAt = new \DateTime("now");
+    }
+
+    /**
+     * Get readAt
+     *
+     * @return \DateTime
+     */
+    public function getReadAt()
+    {
+        return $this->readAt;
+    }
+
+    /**
+     * Reset $readAt
+     */
+    public function resetReadAt()
+    {
+        $this->readAt = null;
+    }
+
+    /**
+     * Set created
+     *
+     * @param  \DateTime $created
+     */
+    public function setCreated(\DateTime $created)
+    {
+        $this->created = $created;
+    }
+
+    /**
+     * Get created
+     *
+     * @return \DateTime
+     */
+    public function getCreated()
+    {
+        return $this->created;
+    }
+
+    /**
+     * Set updated
+     *
+     * @param  \DateTime $updated
+     */
+    public function setUpdated(\DateTime $updated)
+    {
+        $this->updated = $updated;
+    }
+
+    /**
+     * Get updated
+     *
+     * @return \DateTime
+     */
+    public function getUpdated()
+    {
+        return $this->updated;
+    }
+
+    /**
+     * Get message
+     *
+     * @return Message
+     */
+    public function getMessage()
+    {
+        if ($this->message == null) {
+            $this->toMessage();
+        }
+
+        return $this->message;
+    }
+
+    /**
+     * Get a data for Message for "this" object
+     *
+     * callback will be called as js callback maybe deprecated ?!
+     * route and route_parameters make e.g. chrome notifications windows clickable
+     *
+     * @return array
+     */
+    public function getMessageData()
+    {
+        return [
+            "callback" => [],
+        ];
+    }
+
+    /**
+     * Set emitter
+     *
+     * @param  UserInterface $emitter
+     */
+    public function setEmitter(UserInterface $emitter)
+    {
+        $this->emitter = $emitter;
+    }
+
+    /**
+     * Get emitter
+     *
+     * @return UserInterface
+     */
+    public function getEmitter()
+    {
+        return $this->emitter;
+    }
+
+    /**
+     * @return Message
+     */
+    public function toMessage()
+    {
+        /** @type $message Message */
+        $message = new self::$messageClass($this->getOwner(), $this->getEvent(), $this->getEmitter());
+        $message->setData($this->getMessageData());
+        $this->message = $message;
+
+        return $message;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEvent()
+    {
+        $class = get_class($this);
+        $classPart = substr($class, 0, strlen($class));
+        $classPart = explode("\\", $classPart);
+        $classPart = $classPart[count($classPart)-1];
+        $event = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $classPart));
+        return $event;
+    }
+
+    /**
+     * Set message
+     *
+     * @param  Message  $message
+     */
+    public function setMessage($message = null)
+    {
+        $this->message = $message;
+    }
+}

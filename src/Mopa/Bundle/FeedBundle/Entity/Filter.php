@@ -1,5 +1,10 @@
 <?php
 
+/*
+ * Copyright 2015 Philipp A. Mohrenweiser <phiamo@gmail.com>
+ * All rights reserved
+ */
+
 namespace Mopa\Bundle\FeedBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
