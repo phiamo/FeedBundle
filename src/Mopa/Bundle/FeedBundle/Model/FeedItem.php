@@ -17,13 +17,6 @@ use Gedmo\Mapping\Annotation as Gedmo;
 abstract class FeedItem implements MessageableInterface
 {
     /**
-     * Class to use for messaging
-     *
-     * @var string
-     */
-    protected static $messageClass = 'Mopa\Bundle\FeedBundle\Model\Message';
-
-    /**
      * @var int
      */
     protected $id;
@@ -65,6 +58,13 @@ abstract class FeedItem implements MessageableInterface
      * @var \DateTime
      */
     protected $readAt;
+
+    /**
+     * FQDN of the Messaging Class
+     *
+     * @return string
+     */
+    abstract protected function getMessageClass();
 
     /**
      * @return int
@@ -175,6 +175,16 @@ abstract class FeedItem implements MessageableInterface
     }
 
     /**
+     * Set message
+     *
+     * @param  Message  $message
+     */
+    public function setMessage($message = null)
+    {
+        $this->message = $message;
+    }
+
+    /**
      * Get message
      *
      * @return Message
@@ -204,32 +214,13 @@ abstract class FeedItem implements MessageableInterface
     }
 
     /**
-     * Set emitter
-     *
-     * @param  UserInterface $emitter
-     */
-    public function setEmitter(UserInterface $emitter)
-    {
-        $this->emitter = $emitter;
-    }
-
-    /**
-     * Get emitter
-     *
-     * @return UserInterface
-     */
-    public function getEmitter()
-    {
-        return $this->emitter;
-    }
-
-    /**
      * @return Message
      */
     public function toMessage()
     {
+        $messageClass = $this->getMessageClass();
         /** @type $message Message */
-        $message = new self::$messageClass($this->getOwner(), $this->getEvent(), $this->getEmitter());
+        $message = new $messageClass($this->getOwner(), $this->getEvent(), $this->getEmitter());
         $message->setData($this->getMessageData());
         $this->message = $message;
 
@@ -249,13 +240,25 @@ abstract class FeedItem implements MessageableInterface
         return $event;
     }
 
+
     /**
-     * Set message
+     * Set emitter
      *
-     * @param  Message  $message
+     * @param  UserInterface $emitter
      */
-    public function setMessage($message = null)
+    public function setEmitter(UserInterface $emitter)
     {
-        $this->message = $message;
+        $this->emitter = $emitter;
     }
+
+    /**
+     * Get emitter
+     *
+     * @return UserInterface
+     */
+    public function getEmitter()
+    {
+        return $this->emitter;
+    }
+
 }
