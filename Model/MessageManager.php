@@ -7,9 +7,9 @@
 
 namespace Mopa\Bundle\FeedBundle\Model;
 
+use Doctrine\Common\Persistence\ObjectManager;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializationContext;
-use Doctrine\ORM\EntityManager;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
 
 /**
@@ -24,9 +24,9 @@ class MessageManager
     protected $websocketProducer;
 
     /**
-     * @var EntityManager
+     * @var ObjectManager
      */
-    protected $entityManager;
+    protected $objectManager;
 
     /**
      * @var Serializer
@@ -45,15 +45,15 @@ class MessageManager
 
     /**
      * @param Producer $websocketProducer
-     * @param EntityManager $entityManager
+     * @param ObjectManager $objectManager
      * @param Serializer $serializer
      * @param MessageHelper $messageHelper
      * @param $messageClass
      */
-    public function __construct(Producer $websocketProducer, EntityManager $entityManager, Serializer $serializer, MessageHelper $messageHelper, $messageClass)
+    public function __construct(Producer $websocketProducer, ObjectManager $objectManager, Serializer $serializer, MessageHelper $messageHelper, $messageClass)
     {
         $this->websocketProducer = $websocketProducer;
-        $this->entityManager = $entityManager;
+        $this->objectManager = $objectManager;
         $this->serializer = $serializer;
         $this->messageHelper = $messageHelper;
         $this->messageClass = $messageClass;
@@ -68,7 +68,7 @@ class MessageManager
      */
     public function emit(AbstractMessageableInterface $messageAble, $andFlush = true)
     {
-        $this->entityManager->persist($messageAble);
+        $this->objectManager->persist($messageAble);
         $message = $messageAble->toMessage($this->messageClass);
 
         if ($messageAble instanceof SerializableMessageableInterface) {
@@ -83,7 +83,7 @@ class MessageManager
             $messageAble->resetReadAt();
         }
 
-        $this->entityManager->flush($messageAble);
+        $this->objectManager->flush($messageAble);
 
         return $this->send($message, $andFlush);
     }
@@ -120,31 +120,15 @@ class MessageManager
         );
 
         if ($message->getSave()) {
-            $this->entityManager->persist($message);
+            $this->objectManager->persist($message);
         }
         if ($andFlush) {
-            $this->entityManager->flush();
+            $this->objectManager->flush();
         }
 
         $this->websocketProducer->publish($serialized);
 
         return $message;
-    }
-
-    /**
-     * @return EntityManager
-     */
-    public function getEntityManager()
-    {
-        return $this->entityManager;
-    }
-
-    /**
-     * @param EntityManager $entityManager
-     */
-    public function setEntityManager(EntityManager $entityManager)
-    {
-        $this->entityManager = $entityManager;
     }
 
     /**
