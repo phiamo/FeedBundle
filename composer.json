@@ -9,6 +9,9 @@
 			"email" : "phiamo@googlemail.com"
 		}
 	],
+    "require": {
+      "oldsound/rabbitmq-bundle": "1.2.*"
+    },
 	"autoload" : {
 		"psr-0" : {
 			"Mopa\\Bundle\\FeedBundle" : ""
