@@ -1,9 +1,0 @@
-{% from 'MopaBootstrapBundle::macros.html.twig' import badge %}
-
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <p><a href="{{ path('mopa_booksyncgame_game_overview') }}">Score</a>: {{ badge(app.user.score|default(0), false, 'default pull-right') }}</p>
-        <p><a href="{{ path('mopa_booksyncgame_game_overview') }}">Invite's</a>: {{ badge(invitations, false, 'default pull-right') }}</p>
-        <p><a href="{{ path('mopa_booksyncgame_game_overview') }}">Rec'ss</a>: {{ badge(app.user.feedItems.count, false, 'default pull-right') }}</p>
-    </div>
-</div>

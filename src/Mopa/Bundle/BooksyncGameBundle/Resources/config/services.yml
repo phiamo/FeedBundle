@@ -1,4 +1,0 @@
-services:
-#    mopa_booksync_game.example:
-#        class: Mopa\Bundle\BooksyncGameBundle\Example
-#        arguments: [@service_id, "plain_value", %parameter%]

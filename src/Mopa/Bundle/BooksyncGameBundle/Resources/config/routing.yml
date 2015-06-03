@@ -1,3 +1,0 @@
-mopa_booksync_game_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: MopaBooksyncGameBundle:Default:index }

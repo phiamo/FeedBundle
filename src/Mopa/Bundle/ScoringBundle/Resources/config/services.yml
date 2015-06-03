@@ -1,5 +1,0 @@
-services:
-    mopa_scoring.score_manager:
-        class: Mopa\Bundle\ScoringBundle\Entity\ScoreManager
-        arguments:
-            - @doctrine.orm.entity_manager
