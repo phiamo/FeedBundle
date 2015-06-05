@@ -122,6 +122,7 @@ class MessageManager
         if ($message->getSave()) {
             $this->objectManager->persist($message);
         }
+
         if ($andFlush) {
             $this->objectManager->flush();
         }
@@ -129,53 +130,5 @@ class MessageManager
         $this->websocketProducer->publish($serialized);
 
         return $message;
-    }
-
-    /**
-     * @return MessageHelper
-     */
-    public function getMessageHelper()
-    {
-        return $this->messageHelper;
-    }
-
-    /**
-     * @param MessageHelper $messageHelper
-     */
-    public function setMessageHelper(MessageHelper $messageHelper)
-    {
-        $this->messageHelper = $messageHelper;
-    }
-
-    /**
-     * @return Serializer
-     */
-    public function getSerializer()
-    {
-        return $this->serializer;
-    }
-
-    /**
-     * @param Serializer $serializer
-     */
-    public function setSerializer(Serializer $serializer)
-    {
-        $this->serializer = $serializer;
-    }
-
-    /**
-     * @return Producer
-     */
-    public function getWebsocketProducer()
-    {
-        return $this->websocketProducer;
-    }
-
-    /**
-     * @param Producer $websocketProducer
-     */
-    public function setWebsocketProducer(Producer $websocketProducer)
-    {
-        $this->websocketProducer = $websocketProducer;
     }
 }

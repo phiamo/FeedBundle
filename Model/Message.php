@@ -104,7 +104,7 @@ abstract class Message {
      * @param null $save
      * @param null $decorate
      */
-    public function __construct(UserInterface $user, $event, UserInterface $emittingUser = null, $save = null, $decorate = null)
+    public function __construct(UserInterface $user, $event, UserInterface $emittingUser = null, $save = null, $decorate = null, array $data = array())
     {
         $this->created = new \DateTime();
         $this->setUser($user);
@@ -119,6 +119,7 @@ abstract class Message {
         if (null !== $decorate) {
             $this->setDecorate($decorate);
         }
+        $this->setData($data);
     }
 
     /**
@@ -129,6 +130,7 @@ abstract class Message {
     {
         return new static($user, "reload_feed", null, false, false);
     }
+
     /**
      * Get id
      *
@@ -188,6 +190,7 @@ abstract class Message {
     {
         return $this->hideAfter;
     }
+
     /**
      * Set user
      *

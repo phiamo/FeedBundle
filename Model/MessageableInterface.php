@@ -9,6 +9,9 @@ namespace Mopa\Bundle\FeedBundle\Model;
 
 /**
  * Interface MessageableInterface
+ *
+ * Items Extending this interface are aboed to be thrown in MessageManager->emit() method
+ *
  * @package Mopa\Bundle\FeedBundle\Entity
  */
 interface MessageableInterface extends AbstractMessageableInterface
@@ -19,4 +22,11 @@ interface MessageableInterface extends AbstractMessageableInterface
      * @return self
      */
     public function resetReadAt();
+
+    /**
+     * return Message data
+     *
+     * @return array
+     */
+    public function getMessageData();
 }
