@@ -21,8 +21,6 @@ abstract class Message {
      * @var int
      *
      * @Serializer\Accessor(getter="getId")
-     * @Serializer\Groups({"websockets", "websockets.internal"})
-     * @Serializer\Type("integer")
      */
     protected $id;
 
@@ -30,9 +28,6 @@ abstract class Message {
      * might be set to false for certain types e.g. settings update etc, and no need to save them
      *
      * @var boolean
-     *
-     * @Serializer\Groups({"websockets.internal"})
-     * @Serializer\Type("boolean")
      */
     protected $save = true;
 
@@ -41,24 +36,18 @@ abstract class Message {
      * might be set to false for certain types e.g. settings update etc, and no need to decorate them
      *
      * @var boolean
-     * @Serializer\Type("boolean")
-     * @Serializer\Groups({"websockets.internal"})
      */
     protected $decorate = true;
 
     /**
      * @var \DateTime $created
-
-     * @Serializer\Groups({"websockets", "websockets.internal"})
+     *
      * @Gedmo\Timestampable(on="create")
-     * @Serializer\Type("DateTime")
      */
     protected $created;
 
     /**
      * @var integer
-     * @Serializer\Type("integer")
-     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $ttl = -1;
 
@@ -71,8 +60,6 @@ abstract class Message {
 
     /**
      * @var string
-     * @Serializer\Type("string")
-     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $event;
 
@@ -103,14 +90,18 @@ abstract class Message {
      * @param UserInterface $emittingUser
      * @param null $save
      * @param null $decorate
+     * @param array $data
      */
     public function __construct(UserInterface $user, $event, UserInterface $emittingUser = null, $save = null, $decorate = null, array $data = array())
     {
         $this->created = new \DateTime();
-        $this->setUser($user);
-        if (null === $emittingUser) {
+        if (null === $emittingUser && null !== $user) {
             $emittingUser = $user;
         }
+        if (null === $user && null !== $emittingUser) {
+            $user = $emittingUser;
+        }
+        $this->setUser($user);
         $this->setEmittingUser($emittingUser);
         $this->setEvent($event);
         if (null !== $save) {

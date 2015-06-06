@@ -65,6 +65,7 @@ class MessageManager
      * @param  AbstractMessageableInterface $messageAble
      * @param  boolean $andFlush
      * @return Message
+     * @throws \Exception
      */
     public function emit(AbstractMessageableInterface $messageAble, $andFlush = true)
     {
@@ -84,6 +85,14 @@ class MessageManager
         }
 
         $this->objectManager->flush($messageAble);
+
+        if($message->getUser() === null) {
+            throw new \Exception("no user for message ".$message->getId());
+        }
+
+        if($message->getEmittingUser() === null) {
+            throw new \Exception("no emmitting user for message ".$message->getId());
+        }
 
         return $this->send($message, $andFlush);
     }
@@ -118,6 +127,7 @@ class MessageManager
         $serialized = $this->serializer->serialize($message, 'json',
                 SerializationContext::create()->setGroups("websockets.internal")
         );
+
 
         if ($message->getSave()) {
             $this->objectManager->persist($message);

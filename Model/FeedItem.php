@@ -8,7 +8,6 @@
 namespace Mopa\Bundle\FeedBundle\Model;
 
 use FOS\UserBundle\Model\UserInterface;
-use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * Class FeedItem
@@ -33,16 +32,11 @@ abstract class FeedItem implements MessageableInterface
 
     /**
      * @var \DateTime
-     *
-     * @Gedmo\Timestampable(on="create")
      */
     protected $created;
 
     /**
      * @var \DateTime
-     *
-     * @Gedmo\Timestampable(on="create")
-     * Only update on create automatically, otherwise this will lead to unexpected results on setting e.g. readat or adding a message
      */
     protected $updated;
 

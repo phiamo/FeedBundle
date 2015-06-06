@@ -81,9 +81,10 @@ class MessageHelper
     /**
      *
      * @param Message $message
-     * @param array   $formats
-     * @param array   $parts
+     * @param array $formats
+     * @param array $parts
      * @return Message
+     * @throws \Exception
      */
     protected function render(Message $message, array $formats = [], array $parts = ["title", "body"])
     {
@@ -102,6 +103,9 @@ class MessageHelper
             $partData = [];
 
             foreach ($parts as $part) {
+                if($message->getEvent() == null || $message->getEvent() == '') {
+                    throw new \Exception('No Message Event set for ' . $message->getId() . var_export($message->getData(), true));
+                }
                 $template = $this->templatePrefix . $message->getEvent() . "." . $part . "." . $format . '.twig';
                 $partData[$part] = $this->container->get('templating')->render($template, ["msg" => $message]);
             }

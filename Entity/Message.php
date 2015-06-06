@@ -9,18 +9,23 @@ namespace Mopa\Bundle\FeedBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mopa\Bundle\FeedBundle\Model\Message as BaseMessage;
+use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Message
  * @package Mopa\Bundle\FeedBundle\Entity
+ *
  * @ORM\MappedSuperclass()
  */
-class Message extends BaseMessage
+abstract class Message extends BaseMessage
 {
     /**
      * @var \DateTime $created
      *
      * @ORM\Column(type="datetime")
+     *
+     * @Serializer\Type("DateTime")
+     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $created;
 
@@ -30,6 +35,9 @@ class Message extends BaseMessage
      * @var boolean
      *
      * @ORM\Column(type="boolean")
+     *
+     * @Serializer\Groups({"websockets.internal"})
+     * @Serializer\Type("boolean")
      */
     protected $save = true;
 
@@ -39,6 +47,9 @@ class Message extends BaseMessage
      * @var boolean
      *
      * @ORM\Column(type="boolean")
+     *
+     * @Serializer\Type("boolean")
+     * @Serializer\Groups({"websockets.internal"})
      */
     protected $decorate = true;
 
@@ -46,6 +57,9 @@ class Message extends BaseMessage
      * @var integer
      *
      * @ORM\Column(type="integer")
+     *
+     * @Serializer\Type("integer")
+     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $ttl = -1;
 
@@ -60,13 +74,19 @@ class Message extends BaseMessage
      * @var string
      *
      * @ORM\Column(type="string")
+     *
+     * @Serializer\Type("string")
+     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $event;
 
     /**
      * Internal data used while sending message, should be abled to regenerate this at any time
      *
-     * @var
+     * @var array
+     *
+     * @Serializer\Type("array")
+     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $data = array();
 
