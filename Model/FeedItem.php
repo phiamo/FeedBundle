@@ -152,6 +152,7 @@ abstract class FeedItem implements MessageableInterface
      * Set updated
      *
      * @param  \DateTime $updated
+     * @return AbstractMessageableInterface|void
      */
     public function setUpdated(\DateTime $updated)
     {

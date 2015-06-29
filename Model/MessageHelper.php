@@ -106,11 +106,25 @@ class MessageHelper
                 if($message->getEvent() == null || $message->getEvent() == '') {
                     throw new \Exception('No Message Event set for ' . $message->getId() . var_export($message->getData(), true));
                 }
+
                 $template = $this->templatePrefix . $message->getEvent() . "." . $part . "." . $format . '.twig';
-                $partData[$part] = $this->container->get('templating')->render($template, ["msg" => $message]);
+
+                if(!$this->container->get('templating')->exists($template)){
+                    $this->container->get('logger')->warning(sprintf('Template %s does not exist', $template));
+                }
+                else {
+                    $partData[$part] = $this->container->get('templating')->render($template, ["msg" => $message]);
+                }
             }
 
-            $partData["item"] = $this->container->get('templating')->render($this->templatePrefix . "message_item.html.twig", ["msg" => $message]);
+            $template = $this->templatePrefix . "message_item.html.twig";
+
+            if(!$this->container->get('templating')->exists($template)){
+                $this->container->get('logger')->warning(sprintf('Template %s does not exist', $template));
+            }
+            else {
+                $partData["item"] = $this->container->get('templating')->render($template, ["msg" => $message]);
+            }
 
             $data[$format] = $partData;
         }
