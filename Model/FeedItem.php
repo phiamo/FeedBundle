@@ -217,6 +217,7 @@ abstract class FeedItem implements MessageableInterface
         /** @type $message Message */
         $message = new $messageClass($this->getOwner(), $this->getEvent(), $this->getEmitter());
         $message->setData($this->getMessageData());
+        $message->setFeedItem($this);
         $this->message = $message;
 
         return $message;
