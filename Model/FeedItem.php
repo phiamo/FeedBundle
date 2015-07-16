@@ -90,6 +90,26 @@ abstract class FeedItem implements MessageableInterface
     }
 
     /**
+     * Set emitter
+     *
+     * @param  UserInterface $emitter
+     */
+    public function setEmitter(UserInterface $emitter)
+    {
+        $this->emitter = $emitter;
+    }
+
+    /**
+     * Get emitter
+     *
+     * @return UserInterface
+     */
+    public function getEmitter()
+    {
+        return $this->emitter;
+    }
+
+    /**
      * Set readAt
      *
      * @param \DateTime $readAt
@@ -236,25 +256,5 @@ abstract class FeedItem implements MessageableInterface
         return $event;
     }
 
-
-    /**
-     * Set emitter
-     *
-     * @param  UserInterface $emitter
-     */
-    public function setEmitter(UserInterface $emitter)
-    {
-        $this->emitter = $emitter;
-    }
-
-    /**
-     * Get emitter
-     *
-     * @return UserInterface
-     */
-    public function getEmitter()
-    {
-        return $this->emitter;
-    }
 
 }
