@@ -34,6 +34,7 @@ class FeedItemRepository extends EntityRepository
 
         return $qb;
     }
+
     /**
      * @param  UserInterface $user
      * @param  string        $alias
@@ -43,10 +44,14 @@ class FeedItemRepository extends EntityRepository
     {
         $qb = $this->getByOwnerQueryBuilder($user, $alias)
             ->andWhere("f.message IS NOT NULL") // messages not set yet ...
+            ->addSelect(['b', 'e'])
+            ->leftJoin('f.bookmark', 'b')
+            ->leftJoin('f.emitter', 'e')
         ;
 
         return $qb;
     }
+
     /**
      * @param  UserInterface $user
      * @param  string        $alias

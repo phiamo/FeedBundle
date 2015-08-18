@@ -7,29 +7,17 @@
 
 namespace Mopa\Bundle\FeedBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FeedFilter
  *
- * @ORM\Table(name="mopa_feed_filter")
- * @ORM\Entity
- * @ORM\InheritanceType("JOINED")
+ * @ORM\MappedSuperclass()
  */
-class Filter
+abstract class Filter
 {
     const TYPE_EXCLUDE = 0;
     const TYPE_INCLUDE = 1;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(type="integer")
-     * @ORM\Id
-     * @ORM\GeneratedValue(strategy="AUTO")
-     */
-    protected $id;
 
     /**
      * @var bool
@@ -39,13 +27,6 @@ class Filter
     protected $active = false;
 
     /**
-     * @var bool
-     *
-     * @ORM\Column(type="boolean")
-     */
-    protected $hideTags = false;
-
-    /**
      * @var int
      *
      * @ORM\Column(type="integer")
@@ -53,56 +34,34 @@ class Filter
     protected $type = self::TYPE_EXCLUDE;
 
     /**
-     * @var ArrayCollection
-     *
-     * @ORM\OneToMany(targetEntity="Mopa\Bundle\FeedBundle\Entity\FilterRule", cascade={"all"}, mappedBy="filter")
+     * @return boolean
      */
-    protected $rules;
-
-    public function __construct()
+    public function isActive()
     {
-        $this->rules = new ArrayCollection();
+        return $this->active;
     }
 
     /**
-     * Get id
-     *
-     * @return integer
+     * @param boolean $active
      */
-    public function getId()
+    public function setActive($active)
     {
-        return $this->id;
+        $this->active = $active;
     }
 
     /**
-     * @return ArrayCollection
+     * @return int
      */
-    public function getRules()
+    public function getType()
     {
-        return $this->rules;
+        return $this->type;
     }
 
     /**
-     * @param ArrayCollection $rules
+     * @param int $type
      */
-    public function setRules($rules)
+    public function setType($type)
     {
-        $this->rules = $rules;
-    }
-
-    /**
-     * @param FilterRule $rule
-     */
-    public function addRule(FilterRule $rule)
-    {
-        $this->rules->add($rule);
-    }
-
-    /**
-     * @param FilterRule $rule
-     */
-    public function removeRule(FilterRule $rule)
-    {
-        $this->rules->removeElement($rule);
+        $this->type = $type;
     }
 }
