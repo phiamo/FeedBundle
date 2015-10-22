@@ -18,6 +18,20 @@ use FOS\UserBundle\Model\UserInterface;
 class FeedItemRepository extends EntityRepository
 {
     /**
+     * @param string $alias
+     * @return QueryBuilder
+     */
+    public function createQueryBuilder($alias)
+    {
+        $qb = parent::createQueryBuilder($alias)
+            ->select($alias . ", m")
+            ->leftJoin($alias . ".message", "m")
+        ;
+
+        return $qb;
+    }
+
+    /**
      *
      * @param  UserInterface $user
      * @param  string        $alias
@@ -26,9 +40,7 @@ class FeedItemRepository extends EntityRepository
     public function getByOwnerQueryBuilder(UserInterface $user, $alias = "f")
     {
         $qb = $this->createQueryBuilder($alias)
-            ->select($alias . ", m")
-            ->leftJoin($alias . ".message", "m")
-            ->andWhere($alias . '.owner = :owner')
+            ->where($alias . '.owner = :owner')
             ->setParameter("owner", $user)
         ;
 
@@ -43,10 +55,11 @@ class FeedItemRepository extends EntityRepository
     public function getFeedQueryBuilder(UserInterface $user, $alias = "f")
     {
         $qb = $this->getByOwnerQueryBuilder($user, $alias)
-            ->andWhere("f.message IS NOT NULL") // messages not set yet ...
-            ->addSelect(['b', 'e'])
-            ->leftJoin('f.bookmark', 'b')
+            ->addSelect('bookmarks, e')
+            ->leftJoin('f.bookmark', 'bookmarks')
             ->leftJoin('f.emitter', 'e')
+            ->andWhere("f.message IS NOT NULL") // messages not set yet ...
+            ->orderBy("f.updated", "DESC")
         ;
 
         return $qb;
@@ -63,8 +76,12 @@ class FeedItemRepository extends EntityRepository
             ->getFeedQueryBuilder($user, $alias)
             ->andWhere("f.readAt IS NULL")
             ->orderBy("f.updated", "DESC")
-            ;
+        ;
 
         return $qb;
+    }
+
+    public function getFeed($get)
+    {
     }
 }

@@ -9,4 +9,3 @@ services:
             - @doctrine.orm.entity_manager
             - @jms_serializer
             - @mopa_feed.message_helper
-            - %mopa_feed.message.class%

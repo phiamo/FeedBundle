@@ -32,8 +32,6 @@ class MopaFeedExtension extends Extension
         $loader->load('services.yml');
         $loader->load(sprintf('%s.yml', $config['db_driver']));
 
-
-        $container->setParameter('mopa_feed.message.class', $config['message_class']);
         $container->setParameter('mopa_feed.message.template_prefix', $config['message_template_prefix']);
 
 
