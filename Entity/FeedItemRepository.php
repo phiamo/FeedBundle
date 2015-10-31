@@ -19,11 +19,12 @@ class FeedItemRepository extends EntityRepository
 {
     /**
      * @param string $alias
+     * @param null $indexBy
      * @return QueryBuilder
      */
-    public function createQueryBuilder($alias)
+    public function createQueryBuilder($alias, $indexBy = null)
     {
-        $qb = parent::createQueryBuilder($alias)
+        $qb = parent::createQueryBuilder($alias, $indexBy)
             ->select($alias . ", m")
             ->leftJoin($alias . ".message", "m")
         ;

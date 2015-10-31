@@ -54,6 +54,16 @@ abstract class FeedItem implements MessageableInterface
     protected $readAt;
 
     /**
+     * @param UserInterface $owner
+     * @param UserInterface|null $emitter
+     */
+    public function __construct(UserInterface $owner, UserInterface $emitter = null)
+    {
+        $this->owner = $owner;
+        $this->emitter = $emitter;
+    }
+
+    /**
      * FQDN of the Messaging Class
      *
      * @return string
