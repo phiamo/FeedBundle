@@ -245,7 +245,7 @@ abstract class FeedItem implements MessageableInterface
     {
         $messageClass = $this->getMessageClass();
         /** @type $message Message */
-        $message = new $messageClass($this->getOwner(), $this->getEvent(), $this->getEmitter());
+        $message = new $messageClass($this->getEvent(), $this->getOwner(), $this->getEmitter());
         $message->setData($this->getMessageData());
         $message->setFeedItem($this);
         $this->message = $message;
@@ -265,6 +265,4 @@ abstract class FeedItem implements MessageableInterface
         $event = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $classPart));
         return $event;
     }
-
-
 }

@@ -11,6 +11,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializationContext;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
 /**
@@ -40,17 +41,24 @@ class MessageManager
     protected $messageHelper;
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @param Producer $websocketProducer
      * @param ObjectManager $objectManager
      * @param Serializer $serializer
      * @param MessageHelper $messageHelper
+     * @param LoggerInterface $logger
      */
-    public function __construct(Producer $websocketProducer, ObjectManager $objectManager, Serializer $serializer, MessageHelper $messageHelper)
+    public function __construct(Producer $websocketProducer, ObjectManager $objectManager, Serializer $serializer, MessageHelper $messageHelper, LoggerInterface $logger)
     {
         $this->websocketProducer = $websocketProducer;
         $this->objectManager = $objectManager;
         $this->serializer = $serializer;
         $this->messageHelper = $messageHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -100,6 +108,22 @@ class MessageManager
      */
     public function send(Message $message, $andFlush = true)
     {
+        $serialized = $this->prepareMessage($message, $andFlush);
+
+        $this->logger->debug('Sending data to websockets.internal', json_decode($serialized, true));
+
+        $this->websocketProducer->publish($serialized);
+
+        return $message;
+    }
+
+    /**
+     * @param Message $message
+     * @param bool|true $andFlush
+     * @return string
+     */
+    public function prepareMessage(Message $message, $andFlush = true)
+    {
         $payload = $message->getData();
 
         if ($payload instanceof SerializableMessageableInterface) {
@@ -119,9 +143,8 @@ class MessageManager
         $this->messageHelper->decorate($message); // decorating messages so templates know them
 
         $serialized = $this->serializer->serialize($message, 'json',
-                SerializationContext::create()->setGroups("websockets.internal")
+            SerializationContext::create()->setGroups("websockets.internal")
         );
-
 
         if ($message->getSave()) {
             $this->objectManager->persist($message);
@@ -131,15 +154,13 @@ class MessageManager
             $this->objectManager->flush();
         }
 
-        $this->websocketProducer->publish($serialized);
-
-        return $message;
+        return $serialized;
     }
 
     /**
      * Emits a FeedItem beased on the last Part of its class throw it in here we will find it
      *
-     * @param string $class,...
+     * @param string $class, $arguments...
      * @return Message
      * @throws \Exception
      */

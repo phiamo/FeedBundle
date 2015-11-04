@@ -57,7 +57,7 @@ class FeedItemRepository extends EntityRepository
     {
         $qb = $this->getByOwnerQueryBuilder($user, $alias)
             ->addSelect('bookmarks, e')
-            ->leftJoin('f.bookmark', 'bookmarks')
+            ->leftJoin('f.publicBookmark', 'bookmarks')
             ->leftJoin('f.emitter', 'e')
             ->andWhere("f.message IS NOT NULL") // messages not set yet ...
             ->orderBy("f.updated", "DESC")

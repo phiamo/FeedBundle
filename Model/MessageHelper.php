@@ -113,6 +113,7 @@ class MessageHelper
                     $this->container->get('logger')->warning(sprintf('Template %s does not exist', $template));
                 }
                 else {
+                    $this->container->get('logger')->debug(sprintf('Rendering template %s with %', $template, $data));
                     $partData[$part] = $this->container->get('templating')->render($template, ["msg" => $message]);
                 }
             }

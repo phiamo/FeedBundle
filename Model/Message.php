@@ -53,8 +53,6 @@ abstract class Message {
 
     /**
      * @var integer
-     * @Serializer\Type("integer")
-     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $hideAfter = -1;
 
@@ -62,6 +60,11 @@ abstract class Message {
      * @var string
      */
     protected $event;
+
+    /**
+     * @var string|array
+     */
+    protected $serializerGroup = "websockets.internal";
 
     /**
      * @var UserInterface
@@ -74,8 +77,7 @@ abstract class Message {
     protected $emittingUser;
 
     /**
-     * @Serializer\Type("array")
-     * @Serializer\Groups({"websockets", "websockets.internal"})
+     * @var array
      */
     protected $data = array();
 
@@ -85,14 +87,14 @@ abstract class Message {
     protected $feedItem;
 
     /**
+     * @param string $event
      * @param UserInterface $user
-     * @param $event
      * @param UserInterface $emittingUser
      * @param null $save
      * @param null $decorate
      * @param array $data
      */
-    public function __construct(UserInterface $user, $event, UserInterface $emittingUser = null, $save = null, $decorate = null, array $data = array())
+    public function __construct($event, UserInterface $user = null, UserInterface $emittingUser = null, $save = null, $decorate = null, array $data = array())
     {
         $this->created = new \DateTime();
         if (null === $emittingUser && null !== $user) {
@@ -358,5 +360,21 @@ abstract class Message {
         $this->decorate = $decorate;
 
         return $this;
+    }
+
+    /**
+     * @return array|string
+     */
+    public function getSerializerGroup()
+    {
+        return $this->serializerGroup;
+    }
+
+    /**
+     * @param array|string $serializerGroup
+     */
+    public function setSerializerGroup($serializerGroup)
+    {
+        $this->serializerGroup = $serializerGroup;
     }
 }

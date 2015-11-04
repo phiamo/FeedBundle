@@ -67,6 +67,9 @@ abstract class Message extends BaseMessage
      * @var integer
      *
      * @ORM\Column(type="integer")
+     *
+     * @Serializer\Type("integer")
+     * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $hideAfter = -1;
 
@@ -79,6 +82,16 @@ abstract class Message extends BaseMessage
      * @Serializer\Groups({"websockets", "websockets.internal"})
      */
     protected $event;
+
+    /**
+     * @var string|array
+     *
+     * @ORM\Column(type="string")
+     *
+     * @Serializer\Type("string")
+     * @Serializer\Groups({"websockets", "websockets.internal"})
+     */
+    protected $serializerGroup = "websockets.internal";
 
     /**
      * Internal data used while sending message, should be abled to regenerate this at any time
