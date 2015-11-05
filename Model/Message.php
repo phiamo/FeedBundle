@@ -121,7 +121,7 @@ abstract class Message {
      */
     public static function createReloadFeed(UserInterface $user)
     {
-        return new static($user, "reload_feed", null, false, false);
+        return new static("reload_feed", $user, null, false, false);
     }
 
     /**
