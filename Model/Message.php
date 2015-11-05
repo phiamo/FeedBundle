@@ -92,10 +92,14 @@ abstract class Message {
      * @param UserInterface $emittingUser
      * @param null $save
      * @param null $decorate
-     * @param array $data
+     * @param array|SerializableMessageableInterface $data
+     * @throws \Exception
      */
-    public function __construct($event, UserInterface $user = null, UserInterface $emittingUser = null, $save = null, $decorate = null, array $data = array())
+    public function __construct($event, UserInterface $user = null, UserInterface $emittingUser = null, $save = null, $decorate = null, $data = array())
     {
+        if(!is_array($data) && !($data instanceof SerializableMessageableInterface)) {
+            throw new \Exception('Message data must be array or SerializableMessageableInterface');
+        }
         $this->created = new \DateTime();
         if (null === $emittingUser && null !== $user) {
             $emittingUser = $user;
@@ -112,6 +116,7 @@ abstract class Message {
         if (null !== $decorate) {
             $this->setDecorate($decorate);
         }
+
         $this->setData($data);
     }
 
@@ -273,12 +278,13 @@ abstract class Message {
      */
     public function getData()
     {
-        if (count($this->data) == 0 && $this->getFeedItem()) {
+        if (null !== $this->data && is_array($this->data) && count($this->data) == 0 && $this->getFeedItem()) {
             $this->setData($this->getFeedItem()->getMessageData());
         }
 
         return $this->data;
     }
+
     /**
      * Set event
      *

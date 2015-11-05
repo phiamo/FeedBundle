@@ -73,7 +73,6 @@ class MessageManager
     {
         $this->objectManager->persist($messageAble);
         $message = $messageAble->toMessage();
-
         if ($messageAble instanceof SerializableMessageableInterface) {
             /** @var $messageAble SerializableMessageableInterface */
             $message->setData($messageAble);
@@ -130,13 +129,13 @@ class MessageManager
             $data = $this->serializer->serialize($payload, 'json',
                 SerializationContext::create()->setGroups("websockets.internal")
             );
-
             $obj = (array) json_decode($data);
 
             //some objects need further transformation, let em handle this themselves
             if ($payload instanceof MessageObjectTransformer) {
                 $obj = $payload->transformMessageObject($obj);
             }
+            var_dump($message->getDecorate());
             $message->setData($obj);
         }
 

@@ -31,7 +31,6 @@ interface AbstractMessageableInterface
      * Set Updated on emission
      *
      * @param  \DateTime $dateTime
-     * @return self
      */
     public function setUpdated(\DateTime $dateTime);
 }
