@@ -71,7 +71,6 @@ class MessageHelper
             $message->setData($message->getFeedItem()->getMessageData());
         }
         if ($message->getDecorate()) {
-            exit("da");
             return $this->render($message, $formats);
         }
 
@@ -81,20 +80,16 @@ class MessageHelper
     /**
      *
      * @param Message $message
-     * @param array $requestedFormats
+     * @param array $formats
      * @param array $parts
      * @return Message
      * @throws \Exception
      */
-    protected function render(Message $message, array $requestedFormats = [], array $parts = ["title", "body"])
+    protected function render(Message $message, array $formats = [], array $parts = ["title", "body"])
     {
-        if(count($formats = $message->getForceFormats()) == 0) {
-            // fallback to render all formats
-            if (count($requestedFormats) == 0) {
-                $requestedFormats = self::getDataTypes();
-            }
-
-            $formats = array_merge($message->getDefaultFormats(), $requestedFormats);
+        // fallback to render all formats
+        if (count($formats) == 0) {
+            $formats = self::getDataTypes();
         }
 
         $data = $message->getData();
