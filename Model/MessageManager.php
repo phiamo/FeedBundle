@@ -135,7 +135,6 @@ class MessageManager
             if ($payload instanceof MessageObjectTransformer) {
                 $obj = $payload->transformMessageObject($obj);
             }
-            var_dump($message->getDecorate());
             $message->setData($obj);
         }
 
