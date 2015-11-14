@@ -84,7 +84,7 @@ abstract class FeedItem implements MessageableInterface
      * @param UserInterface $owner
      * @return $this
      */
-    public function setOwner(UserInterface $owner = null)
+    public function setOwner(UserInterface $owner)
     {
         $this->owner = $owner;
     }
