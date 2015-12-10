@@ -68,13 +68,17 @@ class FeedItemRepository extends EntityRepository
 
     /**
      * @param  UserInterface $user
-     * @param  string        $alias
+     * @param  string $alias
+     * @param null $qb
      * @return QueryBuilder
      */
-    public function getUnreadFeedQueryBuilder(UserInterface $user, $alias = "f")
+    public function getUnreadFeedQueryBuilder(UserInterface $user, $alias = "f", $qb = null)
     {
-        $qb = $this
-            ->getFeedQueryBuilder($user, $alias)
+        if(null === $qb){
+            $qb = $this->getFeedQueryBuilder($user, $alias);
+        }
+
+        $qb = $qb
             ->andWhere("f.readAt IS NULL")
             ->orderBy("f.updated", "DESC")
         ;

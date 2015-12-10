@@ -17,6 +17,13 @@
 	"target-dir" : "Mopa/Bundle/FeedBundle",
 	"require" : {
       "php" : ">=5.3.2",
-      "oldsound/rabbitmq-bundle": "1.2.*"
-	}
+      "oldsound/rabbitmq-bundle": "1.2.*",
+      "p2/ratchet-bundle": "dev-fix-bridge as 1.0.4"
+	},
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://github.com/phiamo/ratchet-bundle.git"
+      }
+    ]
 }

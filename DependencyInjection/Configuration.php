@@ -39,6 +39,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('message_template_prefix')
                     ->isRequired()
                 ->end()
+                ->scalarNode('message_class')
+                    ->isRequired()
+                ->end()
             ->end()
         ;
         // Here you should define the parameters that are allowed to
