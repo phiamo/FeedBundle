@@ -91,10 +91,9 @@ class SocketServerCommand extends ContainerAwareCommand
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
             $messageHelper = $this->getContainer()->get('mopa_feed.message_helper');
             $serializer = $this->getContainer()->get('jms_serializer');
-            $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
             $client
                 ->connect()
-                ->then(function (Client $client) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer, $entityManager) {
+                ->then(function (Client $client) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer) {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
                             '<info><comment>Stomp</comment> - connected .. verbosity: %s</info>',
@@ -105,7 +104,7 @@ class SocketServerCommand extends ContainerAwareCommand
                          * Gets the connections its relevant to determined by user_id
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
-                        $client->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output, $entityManager) {
+                        $client->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output) {
 
                             //this comes internally via jms serializer
                             /** @var Message $message */
