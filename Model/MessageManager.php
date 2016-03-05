@@ -148,7 +148,7 @@ class MessageManager
             $this->objectManager->persist($message);
         }
 
-        if ($andFlush) {
+        if ($message->getSave() && $andFlush) {
             $this->objectManager->flush();
         }
 
