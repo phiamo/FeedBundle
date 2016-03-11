@@ -86,6 +86,7 @@ class SocketServerCommand extends ContainerAwareCommand
                 'login' => 'guest',
                 'passcode' => 'guest'
             ));
+
             // fetching services, no need to do in the loop
             $eventDispatcher = $this->getContainer()->get('event_dispatcher');
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
