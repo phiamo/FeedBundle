@@ -25,12 +25,16 @@ abstract class Message {
     protected $id;
 
     /**
+     * @var string
+     */
+    protected $class = self::class;
+
+    /**
      * might be set to false for certain types e.g. settings update etc, and no need to save them
      *
      * @var boolean
      */
     protected $save = true;
-
 
     /**
      * might be set to false for certain types e.g. settings update etc, and no need to decorate them
@@ -85,6 +89,11 @@ abstract class Message {
      * @var $feedItem FeedItem
      */
     protected $feedItem;
+
+    /**
+     * @var $templatePrefix
+     */
+    protected $templatePrefix;
 
     /**
      * @param string $event
@@ -382,5 +391,13 @@ abstract class Message {
     public function setSerializerGroup($serializerGroup)
     {
         $this->serializerGroup = $serializerGroup;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplatePrefix()
+    {
+        return $this->templatePrefix;
     }
 }

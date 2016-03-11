@@ -4,6 +4,7 @@ parameters:
 services:
     mopa_feed.message_helper:
         class: %mopa_feed.message_helper.class%
+        lazy: true
         arguments:
             - @service_container
             - %mopa_feed.message.template_prefix%

@@ -75,6 +75,8 @@ class SocketServerCommand extends ContainerAwareCommand
             );
             $rhost = $this->getContainer()->getParameter('rabbitmq_host');
             $rvhost = $this->getContainer()->getParameter('rabbitmq_vhost');
+            $ruser = $this->getContainer()->getParameter('rabbitmq_user');
+            $rpass = $this->getContainer()->getParameter('rabbitmq_pass');
             $loop = $server->loop;
             // hooking stomp to the loop
             $stompFactory = new ReactStompFactory($loop);
@@ -83,8 +85,8 @@ class SocketServerCommand extends ContainerAwareCommand
             $client = $stompFactory->createClient(array(
                 'host'      => $rhost,
                 'vhost' => $rvhost,
-                'login' => 'guest',
-                'passcode' => 'guest'
+                'login' => $ruser,
+                'passcode' => $rpass
             ));
 
             // fetching services, no need to do in the loop
@@ -94,7 +96,8 @@ class SocketServerCommand extends ContainerAwareCommand
             $serializer = $this->getContainer()->get('jms_serializer');
             $client
                 ->connect()
-                ->then(function (Client $client) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer) {
+                ->then(function (Client $client) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer)
+                {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
                             '<info><comment>Stomp</comment> - connected .. verbosity: %s</info>',
@@ -105,15 +108,18 @@ class SocketServerCommand extends ContainerAwareCommand
                          * Gets the connections its relevant to determined by user_id
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
-                        $client->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output) {
+                        $client->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output)
+                        {
+                            $tmp = json_decode($frame->body, true);
 
                             //this comes internally via jms serializer
                             /** @var Message $message */
                             $message = $serializer->deserialize(
                                     $frame->body,
-                                    $this->getContainer()->getParameter('mopa_feed.message.class'),
+                                    $tmp['class'],
                                     'json'
                             );
+
                             $event = $message->getEvent();
 
                             /** @var UserInterface $user */
@@ -130,8 +136,8 @@ class SocketServerCommand extends ContainerAwareCommand
                             if ($user && $connectionManager->hasClientId($user->getId())) {
                                 if ($output->getVerbosity() > 2) {
                                     $output->writeln("Having Client Id for User: <info>".$user->getUsername()."</info>");
-                                }
-                                $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
+                                }                                $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
+
 
                                 /** @var Connection $connection */
                                 foreach ($connections as $connection) {
