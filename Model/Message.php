@@ -15,8 +15,8 @@ use JMS\Serializer\Annotation as Serializer;
  * Class Message
  * @package Mopa\Bundle\FeedBundle\Message
  */
-abstract class Message {
-
+abstract class Message
+{
     /**
      * @var int
      *
