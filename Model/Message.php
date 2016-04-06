@@ -271,13 +271,28 @@ abstract class Message
      * Set data
      *
      * @param  array|SerializableMessageableInterface $data
-     * @return Message
      */
     public function setData($data)
     {
-        $this->data = $data;
 
-        return $this;
+        $this->data = $this->filterResources($data);
+    }
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    protected function filterResources(array $data)
+    {
+        foreach($data as $k => $v){
+            if(is_array($v)){
+                $data[$k] = $this->filterResources($v);
+            }
+            if(is_resource($v)){
+                unset($data[$k]);
+            }
+        }
+        return $data;
     }
 
     /**
