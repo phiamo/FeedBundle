@@ -5,31 +5,25 @@
  * All rights reserved
  */
 
-namespace Mopa\Bundle\FeedBundle\Entity;
+namespace Mopa\Bundle\FeedBundle\Document;
 
-use Doctrine\ORM\Mapping as ORM;
+
+use Doctrine\ODM\MongoDB\Mapping\Annotations as MongoDB;
 use Mopa\Bundle\FeedBundle\Model\Message as BaseMessage;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Message
- * @package Mopa\Bundle\FeedBundle\Entity
+ * @package Mopa\Bundle\FeedBundle\Document
  *
- * @ORM\MappedSuperclass()
+ * @MongoDB\MappedSuperclass()
  */
 abstract class Message extends BaseMessage
 {
     /**
-     * Override this with e.g. `protected $class = self::class;`
-     *
-     * @var string
-     */
-    protected $class;
-
-    /**
      * @var \DateTime $created
      *
-     * @ORM\Column(type="datetime")
+     * @MongoDB\Field(type="date")
      */
     protected $created;
 
@@ -38,7 +32,7 @@ abstract class Message extends BaseMessage
      *
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @MongoDB\Field(type="boolean")
      */
     protected $save = true;
 
@@ -47,35 +41,35 @@ abstract class Message extends BaseMessage
      *
      * @var boolean
      *
-     * @ORM\Column(type="boolean")
+     * @MongoDB\Field(type="boolean")
      */
     protected $decorate = true;
 
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @MongoDB\Field(type="integer")
      */
     protected $ttl = -1;
 
     /**
      * @var integer
      *
-     * @ORM\Column(type="integer")
+     * @MongoDB\Field(type="integer")
      */
     protected $hideAfter = -1;
 
     /**
      * @var string
      *
-     * @ORM\Column(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $event;
 
     /**
      * @var string|array
      *
-     * @ORM\Column(type="string")
+     * @MongoDB\Field(type="string")
      */
     protected $serializerGroup = "websockets.internal";
 }

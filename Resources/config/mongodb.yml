@@ -3,10 +3,10 @@ parameters:
 
 services:
     mopa_feed.message_manager:
-        class: %mopa_feed.message_manager.class%
+        class: "%mopa_feed.message_manager.class%"
         arguments:
-            - @old_sound_rabbit_mq.websockets_producer
-            - @doctrine.odm.mongodb.document_manager
-            - @jms_serializer
-            - @mopa_feed.message_helper
-            - @logger
+            - "@old_sound_rabbit_mq.websockets_producer"
+            - "@doctrine.odm.mongodb.document_manager"
+            - "@jms_serializer"
+            - "@mopa_feed.message_helper"
+            - "@logger"

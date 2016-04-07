@@ -18,7 +18,7 @@ class Application implements ApplicationInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'mopa_feed.websockets' => 'onMessage'
+            'websockets' => 'onMessage'
         );
     }
 

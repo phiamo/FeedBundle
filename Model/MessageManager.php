@@ -109,7 +109,7 @@ class MessageManager
     {
         $serialized = $this->prepareMessage($message, $andFlush);
 
-        $this->logger->debug('Sending data to websockets.internal', json_decode($serialized, true));
+        $this->logger->debug('Sending data to websockets', json_decode($serialized, true));
 
         $this->websocketProducer->publish($serialized);
 
@@ -126,15 +126,18 @@ class MessageManager
         $payload = $message->getData();
 
         if ($payload instanceof SerializableMessageableInterface) {
+
             $data = $this->serializer->serialize($payload, 'json',
                 SerializationContext::create()->setGroups("websockets.internal")
             );
+
             $obj = (array) json_decode($data);
 
             //some objects need further transformation, let em handle this themselves
             if ($payload instanceof MessageObjectTransformer) {
                 $obj = $payload->transformMessageObject($obj);
             }
+
             $message->setData($obj);
         }
 
@@ -168,8 +171,9 @@ class MessageManager
             throw new \Exception('Class must be a string. '.(string)$class.' given');
         }
 
-        $fullClass = self::findFullClass($class);
-        $r = new ReflectionClass($fullClass);
+        $class = self::findFullClass($class);
+
+        $r = new ReflectionClass($class);
 
         $args = func_get_args();
         $arrayOfConstructorArgs = array_splice($args, 1);
@@ -183,13 +187,19 @@ class MessageManager
      * @param $class
      * @return mixed
      */
-    public static function findFullClass($class) {
+    public static function findFullClass($class)
+    {
+        if(class_exists($class)){
+            return $class;
+        }
+
         $classes = get_declared_classes();
         foreach($classes as $declared){
             if(($temp = strlen($declared) - strlen($class)) >= 0 && strpos($declared, $class, $temp) !== FALSE){
                 return $declared;
             }
         }
+
         return $class;
     }
 }

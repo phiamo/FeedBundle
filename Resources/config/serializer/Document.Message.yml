@@ -1,0 +1,7 @@
+Mopa\Bundle\FeedBundle\Document\Message:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            type: string
+            groups: ["websockets", "websockets.internal"]

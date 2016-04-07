@@ -16,10 +16,10 @@ use P2\Bundle\RatchetBundle\WebSocket\Payload;
 use JMS\Serializer\SerializationContext;
 
 /**
- * Class SocketServerCommand
+ * Class WebsocketServerCommand
  * @package Mopa\Bundle\FeedBundle\Command
  */
-class SocketServerCommand extends ContainerAwareCommand
+class WebsocketServerCommand extends ContainerAwareCommand
 {
     /**
      * @var string
@@ -143,12 +143,11 @@ class SocketServerCommand extends ContainerAwareCommand
                                 foreach ($connections as $connection) {
                                     if ($connection) {
                                         $message = $messageHelper->decorate($message, array($connection->getDataType()));
-
                                         // this is an "external endpoint so we need to use a real serializer here
                                         // json_decode to reform for Payload->encode()
-                                        $msg = json_decode($serializer
-                                            ->serialize($message, // using the full serializer feature set
-                                                'json', SerializationContext::create()->setGroups("websockets")
+                                        $msg = json_decode(
+                                                $serializer->serialize($message, // using the full serializer feature set
+                                                    'json', SerializationContext::create()->setGroups("websockets")
                                             )
                                         );
 
@@ -165,7 +164,8 @@ class SocketServerCommand extends ContainerAwareCommand
                                                 '<info>With data</info>'.var_export($msg, true)
                                             );
                                         }
-                                        $eventDispatcher->dispatch('mopa_feed.websockets',
+
+                                        $eventDispatcher->dispatch('websockets',
                                             new ConnectionEvent($connection, $payload)
                                         );
                                     } else {

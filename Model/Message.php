@@ -8,7 +8,6 @@
 namespace Mopa\Bundle\FeedBundle\Model;
 
 use FOS\UserBundle\Model\UserInterface;
-use Gedmo\Mapping\Annotation as Gedmo;
 use JMS\Serializer\Annotation as Serializer;
 
 /**
@@ -27,7 +26,12 @@ abstract class Message
     /**
      * @var string
      */
-    protected $class = self::class;
+    protected $recieverId;
+
+    /**
+     * @var string
+     */
+    protected $class;
 
     /**
      * might be set to false for certain types e.g. settings update etc, and no need to save them
@@ -45,8 +49,6 @@ abstract class Message
 
     /**
      * @var \DateTime $created
-     *
-     * @Gedmo\Timestampable(on="create")
      */
     protected $created;
 
@@ -81,6 +83,8 @@ abstract class Message
     protected $emittingUser;
 
     /**
+     * Internal data used while sending message, should be abled to regenerate this at any time
+     *
      * @var array
      */
     protected $data = array();
@@ -109,24 +113,43 @@ abstract class Message
         if(!is_array($data) && !($data instanceof SerializableMessageableInterface)) {
             throw new \Exception('Message data must be array or SerializableMessageableInterface');
         }
+
+        if(!$this->class) {
+            throw new \Exception('Message class must be set. Override property with e.g. `protected $class = self::class;`');
+        }
+
         $this->created = new \DateTime();
+
         if (null === $emittingUser && null !== $user) {
             $emittingUser = $user;
         }
+
         if (null === $user && null !== $emittingUser) {
             $user = $emittingUser;
         }
+
         $this->setUser($user);
         $this->setEmittingUser($emittingUser);
         $this->setEvent($event);
+
         if (null !== $save) {
             $this->setSave($save);
         }
+
         if (null !== $decorate) {
             $this->setDecorate($decorate);
         }
 
         $this->setData($data);
+    }
+
+    /**
+     * Set a unique reciever id for e.g. OneToOne Connections like console
+     * @param $id
+     */
+    public function setReciever($id)
+    {
+        $this->recieverId = $id;
     }
 
     /**
