@@ -70,7 +70,7 @@ abstract class Message
     /**
      * @var string|array
      */
-    protected $serializerGroup = "websockets.internal";
+    protected $serializerGroup = "mopa_feed_websockets.internal";
 
     /**
      * @var UserInterface

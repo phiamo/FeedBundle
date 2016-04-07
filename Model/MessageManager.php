@@ -109,7 +109,7 @@ class MessageManager
     {
         $serialized = $this->prepareMessage($message, $andFlush);
 
-        $this->logger->debug('Sending data to websockets', json_decode($serialized, true));
+        $this->logger->debug('Sending data to mopa_feed_websockets', json_decode($serialized, true));
 
         $this->websocketProducer->publish($serialized);
 
@@ -128,7 +128,7 @@ class MessageManager
         if ($payload instanceof SerializableMessageableInterface) {
 
             $data = $this->serializer->serialize($payload, 'json',
-                SerializationContext::create()->setGroups("websockets.internal")
+                SerializationContext::create()->setGroups("mopa_feed_websockets.internal")
             );
 
             $obj = (array) json_decode($data);
@@ -144,7 +144,7 @@ class MessageManager
         $this->messageHelper->decorate($message); // decorating messages so templates know them
 
         $serialized = $this->serializer->serialize($message, 'json',
-            SerializationContext::create()->setGroups("websockets.internal")
+            SerializationContext::create()->setGroups("mopa_feed_websockets.internal")
         );
 
         if ($message->getSave()) {

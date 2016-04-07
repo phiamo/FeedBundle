@@ -147,7 +147,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                         // json_decode to reform for Payload->encode()
                                         $msg = json_decode(
                                                 $serializer->serialize($message, // using the full serializer feature set
-                                                    'json', SerializationContext::create()->setGroups("websockets")
+                                                    'json', SerializationContext::create()->setGroups("mopa_feed_websockets")
                                             )
                                         );
 
@@ -164,8 +164,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                                 '<info>With data</info>'.var_export($msg, true)
                                             );
                                         }
-
-                                        $eventDispatcher->dispatch('websockets',
+                                        $eventDispatcher->dispatch('mopa_feed.websocket.message',
                                             new ConnectionEvent($connection, $payload)
                                         );
                                     } else {

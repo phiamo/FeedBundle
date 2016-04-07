@@ -3,43 +3,43 @@ Mopa\Bundle\FeedBundle\Model\Message:
     properties:
         id:
             expose: true
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         class:
             expose: true
             type: string
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets.internal"]
         created:
             expose: true
             type: DateTime
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         save:
             expose: true
             type: boolean
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets.internal"]
         decorate:
             expose: true
             type: boolean
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets.internal"]
         ttl:
             expose: true
             type: integer
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         hideAfter:
             expose: true
             type: integer
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         event:
             expose: true
             type: string
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         serializerGroup:
             expose: true
             type: string
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets.internal"]
         data:
             expose: true
             type: array
             accessor:
                 getter: "getData"
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
 

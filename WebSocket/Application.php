@@ -7,6 +7,8 @@ use P2\Bundle\RatchetBundle\WebSocket\Server\ApplicationInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Payload;
 
 /**
+ * Symfony2 Event Subscriber to hook into P2Ratchet
+ *
  * Class Application
  * @package Mopa\Bundle\FeedBundle\WebSocket
  */
@@ -18,7 +20,7 @@ class Application implements ApplicationInterface
     public static function getSubscribedEvents()
     {
         return array(
-            'websockets' => 'onMessage'
+            'mopa_feed.websocket.message' => 'onMessage'
         );
     }
 

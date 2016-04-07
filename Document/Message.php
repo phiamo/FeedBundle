@@ -71,5 +71,5 @@ abstract class Message extends BaseMessage
      *
      * @MongoDB\Field(type="string")
      */
-    protected $serializerGroup = "websockets.internal";
+    protected $serializerGroup = "mopa_feed_websockets.internal";
 }

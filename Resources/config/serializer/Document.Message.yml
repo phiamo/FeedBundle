@@ -4,4 +4,4 @@ Mopa\Bundle\FeedBundle\Document\Message:
         id:
             expose: true
             type: string
-            groups: ["websockets", "websockets.internal"]
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
