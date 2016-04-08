@@ -24,6 +24,8 @@ abstract class Message
     protected $id;
 
     /**
+     * Set a reciever Id on the Message, which will be used for one to one communication instead of fan out websocketing
+     *
      * @var string
      */
     protected $recieverId;
@@ -299,6 +301,22 @@ abstract class Message
     {
 
         $this->data = $this->filterResources($data);
+    }
+
+    /**
+     * @return string
+     */
+    public function getRecieverId()
+    {
+        return $this->recieverId;
+    }
+
+    /**
+     * @param string $recieverId
+     */
+    public function setRecieverId($recieverId)
+    {
+        $this->recieverId = $recieverId;
     }
 
     /**

@@ -4,6 +4,9 @@ Mopa\Bundle\FeedBundle\Model\Message:
         id:
             expose: true
             groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        recieverId:
+            expose: true
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         class:
             expose: true
             type: string
