@@ -7,11 +7,10 @@
 
 namespace Mopa\Bundle\FeedBundle\Model;
 
+use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-//used if installed
-use Mopa\Bundle\BooksyncBundle\WebSocket\Server\Connection;
 
 /**
  * Class MessageHelper
@@ -22,7 +21,7 @@ class MessageHelper
     /**
      * @var array
      */
-    public static $dataTypes = [
+    const dataTypes = [
         'txt',
         'html'
     ];
@@ -52,10 +51,7 @@ class MessageHelper
      */
     protected static function getDataTypes()
     {
-        if(class_exists('Connection')){
-            return array_merge(Connection::$dataTypes, self::$dataTypes);
-        }
-        return self::$dataTypes;
+        return array_merge(Connection::dataTypes, self::dataTypes);
     }
 
     /**

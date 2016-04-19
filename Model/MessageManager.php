@@ -85,7 +85,9 @@ class MessageManager
             $messageAble->resetReadAt();
         }
 
-        $this->objectManager->flush();
+        if($andFlush) {
+            $this->objectManager->flush();
+        }
 
         if($message->getUser() === null) {
             throw new \Exception("no user for message ".$message->getId());

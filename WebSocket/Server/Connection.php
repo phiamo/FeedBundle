@@ -12,7 +12,7 @@ class Connection extends BaseConnection
     /**
      * @var array
      */
-    public static $dataTypes = [
+    const dataTypes = [
         'txt',
         'html'
     ];
@@ -35,7 +35,7 @@ class Connection extends BaseConnection
      */
     public function setDataType($type)
     {
-        if (in_array($type, self::$dataTypes)) { // getting null or smth else
+        if (in_array($type, self::dataTypes)) { // getting null or smth else
             $this->dataType = $type;
         }
     }
