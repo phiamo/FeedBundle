@@ -59,8 +59,8 @@ abstract class FeedItem implements MessageableInterface
      */
     public function __construct(UserInterface $owner, UserInterface $emitter = null)
     {
-        $this->owner = $owner;
-        $this->emitter = $emitter;
+        $this->setOwner($owner);
+        $this->setEmitter($emitter);
     }
 
     /**
@@ -82,7 +82,6 @@ abstract class FeedItem implements MessageableInterface
      * Set owner
      *
      * @param UserInterface $owner
-     * @return $this
      */
     public function setOwner(UserInterface $owner)
     {
@@ -123,7 +122,6 @@ abstract class FeedItem implements MessageableInterface
      * Set readAt
      *
      * @param \DateTime $readAt
-     * @return $this
      */
     public function setReadAt(\DateTime $readAt)
     {
@@ -132,8 +130,6 @@ abstract class FeedItem implements MessageableInterface
 
     /**
      * Set readAt
-     *
-     * @return $this
      */
     public function setRead()
     {
