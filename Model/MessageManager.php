@@ -152,6 +152,11 @@ class MessageManager
         if ($message->getSave()) {
             $this->objectManager->persist($message);
         }
+        else {
+            if($message->getFeedItem() instanceof FeedItem) {
+                $message->getFeedItem()->setMessage(null);
+            }
+        }
 
         if ($message->getSave() && $andFlush) {
             $this->objectManager->flush();
