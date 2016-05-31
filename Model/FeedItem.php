@@ -103,7 +103,7 @@ abstract class FeedItem implements MessageableInterface
      *
      * @param  UserInterface $emitter
      */
-    public function setEmitter(UserInterface $emitter)
+    public function setEmitter(UserInterface $emitter = null)
     {
         $this->emitter = $emitter;
     }
