@@ -82,7 +82,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
             $stompFactory = new ReactStompFactory($loop);
             // adding stomp login
             /** @var Client $client */
-            $client = $stompFactory->createClient(array(
+            $stompClient = $stompFactory->createClient(array(
                 'host'      => $rhost,
                 'vhost' => $rvhost,
                 'login' => $ruser,
@@ -94,9 +94,9 @@ class WebsocketServerCommand extends ContainerAwareCommand
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
             $messageHelper = $this->getContainer()->get('mopa_feed.message_helper');
             $serializer = $this->getContainer()->get('jms_serializer');
-            $client
+            $stompClient
                 ->connect()
-                ->then(function (Client $client) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer)
+                ->then(function (Client $stompClient) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer)
                 {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
@@ -108,9 +108,11 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * Gets the connections its relevant to determined by user_id
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
-                        $client->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output)
+                        $stompClient->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output)
                         {
                             $tmp = json_decode($frame->body, true);
+
+                            $output->writeln('Got frame: '.$frame->body);
 
                             //this comes internally via jms serializer
                             /** @var Message $message */

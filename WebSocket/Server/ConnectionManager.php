@@ -1,6 +1,8 @@
 <?php
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
+
+use Mopa\Bundle\FeedBundle\Model\AnonymousUser;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnectionManager;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Exception\NotManagedConnectionException;
@@ -36,7 +38,7 @@ class ConnectionManager extends BaseConnectionManager
     public function hasClientId($user_id)
     {
         foreach ($this->connections as $id => $connection) {
-            if ($connection->getClient() && $connection->getClient()->getId() == $user_id) {
+            if (null !== $user_id && $connection->getClient() && $connection->getClient()->getId() == $user_id) {
                 return true;
             }
         }
@@ -77,17 +79,19 @@ class ConnectionManager extends BaseConnectionManager
     }
 
     /**
-     * @param  ConnectionInterface                                                        $connection
-     * @param  string                                                                     $data
+     * @param  ConnectionInterface|Connection $connection
+     * @param  array $data
      * @return bool
      * @throws \P2\Bundle\RatchetBundle\WebSocket\Exception\NotManagedConnectionException
      */
     public function authenticate(ConnectionInterface $connection, $data)
     {
         if (!isset($data["token"])) {
-            return false;
+            $accessToken = '';
         }
-        $accessToken = $data["token"];
+        else{
+            $accessToken = $data["token"];
+        }
 
         if (! isset($this->connections[$connection->getId()])) {
             throw new NotManagedConnectionException();
@@ -97,6 +101,13 @@ class ConnectionManager extends BaseConnectionManager
             $connection->setClient($client);
             $type = @$data["data_type"];
             $connection->setDataType($type);
+
+            return true;
+        }
+
+        if ($accessToken != '') {
+            $client = new AnonymousUser($accessToken);
+            $connection->setClient($client);
 
             return true;
         }

@@ -145,14 +145,6 @@ abstract class Message
         $this->setData($data);
     }
 
-    /**
-     * Set a unique reciever id for e.g. OneToOne Connections like console
-     * @param $id
-     */
-    public function setReciever($id)
-    {
-        $this->recieverId = $id;
-    }
 
     /**
      * @param  UserInterface    $user
