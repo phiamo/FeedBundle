@@ -56,7 +56,7 @@ class MessageHelper
 
     /**
      * Decorate a Message depending on the formats given
-     *
+     * Take decorator service if needed by message
      * @param Message $message
      * @param array   $formats
      * @return Message
@@ -67,14 +67,23 @@ class MessageHelper
             $message->setData($message->getFeedItem()->getMessageData());
         }
         if ($message->getDecorate()) {
-            return $this->render($message, $formats);
+            if($message->getDecoratorService() === 'templating'){
+                return $this->render($message, $formats);
+            }
+            elseif($this->container->has($message->getDecoratorService())) {
+                /** @var MessageDecoratorInterface $decorator */
+                $decorator = $this->container->get($message->getDecoratorService());
+                return $decorator->decorate($message, $formats);
+            }
+            else{
+                $this->container->get('logger')->warning(sprintf('Decorator Service "%s" does not exist', $message->getDecoratorService()));
+            }
         }
 
         return $message;
     }
 
     /**
-     *
      * @param Message $message
      * @param array $formats
      * @param array $parts

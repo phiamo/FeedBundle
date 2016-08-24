@@ -50,6 +50,14 @@ abstract class Message
     protected $decorate = true;
 
     /**
+     * use decorator service
+     * default: templating done via MessagingHelper
+     *
+     * @var string
+     */
+    protected $decoratorService = 'templating';
+
+    /**
      * @var \DateTime $created
      */
     protected $created;
@@ -309,6 +317,22 @@ abstract class Message
     public function setRecieverId($recieverId)
     {
         $this->recieverId = $recieverId;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDecoratorService()
+    {
+        return $this->decoratorService;
+    }
+
+    /**
+     * @param string $decoratorService
+     */
+    public function setDecoratorService($decoratorService)
+    {
+        $this->decoratorService = $decoratorService;
     }
 
     /**
