@@ -54,13 +54,20 @@ abstract class FeedItem implements MessageableInterface
     protected $readAt;
 
     /**
+     * @var array
+     */
+    protected $options = array();
+
+    /**
      * @param UserInterface $owner
      * @param UserInterface|null $emitter
+     * @param array $options
      */
-    public function __construct(UserInterface $owner, UserInterface $emitter = null)
+    public function __construct(UserInterface $owner, UserInterface $emitter = null, $options = array())
     {
         $this->setOwner($owner);
         $this->setEmitter($emitter);
+        $this->setOptions($options);
     }
 
     /**
@@ -260,5 +267,21 @@ abstract class FeedItem implements MessageableInterface
         $classPart = $classPart[count($classPart)-1];
         $event = strtolower(preg_replace('/([a-z])([A-Z])/', '$1_$2', $classPart));
         return $event;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
     }
 }
