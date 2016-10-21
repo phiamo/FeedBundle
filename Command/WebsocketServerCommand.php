@@ -51,6 +51,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
     {
         if ($output->getVerbosity() > 0) {
             $output->writeln('Verbosity: '.$output->getVerbosity());
+            $output->writeln('Env: '.$this->getContainer()->get('kernel')->getEnvironment());
         }
         try {
             /** @var \P2\Bundle\RatchetBundle\WebSocket\Server\Factory $factory */
@@ -138,8 +139,9 @@ class WebsocketServerCommand extends ContainerAwareCommand
                             if ($user && $connectionManager->hasClientId($user->getId())) {
                                 if ($output->getVerbosity() > 2) {
                                     $output->writeln("Having Client Id for User: <info>".$user->getUsername()."</info>");
-                                }                                $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
+                                }
 
+                                $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
 
                                 /** @var Connection $connection */
                                 foreach ($connections as $connection) {
