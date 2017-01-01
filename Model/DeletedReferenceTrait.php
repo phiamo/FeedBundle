@@ -31,10 +31,11 @@ trait DeletedReferenceTrait
     {
         if(null !== $object = $this->getReference()) {
             try{
-                if(!method_exists($object, 'deletedAt')) {
+                if(method_exists($object, 'getDeletedAt')) {
                     return $object->getDeletedAt() !== null; // depending on the order of method calls returning getDeleted == null might return wrong values
                 }
-                throw new \Exception('Method deletedAt does not exist on referenced object, does "'.get_class($object).'" use SoftDeletableDocument Trait or similar?');
+
+                throw new \Exception('Method getDeletedAt does not exist on referenced object, does "'.get_class($object).'" use SoftDeletableDocument Trait or similar?');
             }
             catch(DocumentNotFoundException $e){
                 return true;
