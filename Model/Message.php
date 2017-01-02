@@ -110,6 +110,11 @@ abstract class Message
     protected $templatePrefix;
 
     /**
+     * @var boolean
+     */
+    protected $broadcast = false;
+
+    /**
      * @param string $event
      * @param UserInterface $user
      * @param UserInterface $emittingUser
@@ -181,13 +186,10 @@ abstract class Message
      * Set ttl
      *
      * @param  integer $ttl
-     * @return Message
      */
     public function setTtl($ttl)
     {
         $this->ttl = $ttl;
-
-        return $this;
     }
 
     /**
@@ -204,13 +206,10 @@ abstract class Message
      * Set hideAfter
      *
      * @param  integer $hideAfter
-     * @return Message
      */
     public function setHideAfter($hideAfter)
     {
         $this->hideAfter = $hideAfter;
-
-        return $this;
     }
 
     /**
@@ -227,13 +226,10 @@ abstract class Message
      * Set user
      *
      * @param  UserInterface    $user
-     * @return Message
      */
     public function setUser(UserInterface $user = null)
     {
         $this->user = $user;
-
-        return $this;
     }
 
     /**
@@ -250,13 +246,10 @@ abstract class Message
      * Set emittingUser
      *
      * @param  UserInterface    $emittingUser
-     * @return Message
      */
     public function setEmittingUser(UserInterface $emittingUser = null)
     {
         $this->emittingUser = $emittingUser;
-
-        return $this;
     }
 
     /**
@@ -273,13 +266,10 @@ abstract class Message
      * Set created
      *
      * @param  \DateTime $created
-     * @return Message
      */
     public function setCreated($created)
     {
         $this->created = $created;
-
-        return $this;
     }
 
     /**
@@ -370,13 +360,10 @@ abstract class Message
      * Set event
      *
      * @param  string  $event
-     * @return Message
      */
     public function setEvent($event)
     {
         $this->event = $event;
-
-        return $this;
     }
 
     /**
@@ -392,13 +379,10 @@ abstract class Message
      * Set feedItem
      *
      * @param  FeedItem $feedItem
-     * @return Message
      */
     public function setFeedItem(FeedItem $feedItem)
     {
         $this->feedItem = $feedItem;
-
-        return $this;
     }
 
     /**
@@ -421,13 +405,10 @@ abstract class Message
 
     /**
      * @param $save
-     * @return $this
      */
     public function setSave($save)
     {
         $this->save = $save;
-
-        return $this;
     }
 
     /**
@@ -440,13 +421,10 @@ abstract class Message
 
     /**
      * @param $decorate
-     * @return $this
      */
     public function setDecorate($decorate)
     {
         $this->decorate = $decorate;
-
-        return $this;
     }
 
     /**
@@ -471,5 +449,13 @@ abstract class Message
     public function getTemplatePrefix()
     {
         return $this->templatePrefix;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBroadcast()
+    {
+        return $this->broadcast;
     }
 }

@@ -5,6 +5,7 @@ namespace Mopa\Bundle\FeedBundle\Command;
 use FOS\UserBundle\Model\UserInterface;
 use Mopa\Bundle\FeedBundle\Entity\Message;
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
+use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use React\Stomp\Client;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -123,20 +124,15 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                     'json'
                             );
 
-                            $event = $message->getEvent();
-
                             /** @var UserInterface $user */
                             $user = $message->getUser();
 
-                            if ($output->getVerbosity() > 1) {
-                                if ($user) {
-                                    $output->writeln("Got Msg for User: <info>".$user->getUsername()."</info>");
-                                } else {
-                                    $output->writeln("Couldnt get User for: <info>".$frame->body."</info>");
+                            if(!$user && $message->isBroadcast()) {
+                                $output->writeln("<info>Broadcasting from: ".$message->getEmittingUser()->getUsername()."</info>");
+                                foreach($connectionManager->getConnections() as $connection) {
+                                    $this->send($message, $connection, $output);
                                 }
-                            }
-
-                            if ($user && $connectionManager->hasClientId($user->getId())) {
+                            }elseif ($user && $connectionManager->hasClientId($user->getId())) {
                                 if ($output->getVerbosity() > 2) {
                                     $output->writeln("Having Client Id for User: <info>".$user->getUsername()."</info>");
                                 }
@@ -146,31 +142,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                 /** @var Connection $connection */
                                 foreach ($connections as $connection) {
                                     if ($connection) {
-                                        $message = $messageHelper->decorate($message, array($connection->getDataType()));
-                                        // this is an "external endpoint so we need to use a real serializer here
-                                        // json_decode to reform for Payload->encode()
-                                        $msg = json_decode(
-                                                $serializer->serialize($message, // using the full serializer feature set
-                                                    'json', SerializationContext::create()->setGroups("mopa_feed_websockets")
-                                            )
-                                        );
-
-                                        $payload = new Payload($event, $msg);
-
-                                        if (OutputInterface::VERBOSITY_NORMAL <= $output->getVerbosity()) {
-                                            $output->writeln(
-                                                    '<info><comment>Stomp</comment> dispatching '.$event.'</info> for conn #'.$connection->getId()." User ".$message->getUser()->getId().' Type: ' .$connection->getDataType(). ''
-                                            );
-                                        }
-
-                                        if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                                            $output->writeln(
-                                                '<info>With data</info>'.var_export($msg, true)
-                                            );
-                                        }
-                                        $eventDispatcher->dispatch('mopa_feed.websocket.message',
-                                            new ConnectionEvent($connection, $payload)
-                                        );
+                                        $this->send($message, $connection, $output);
                                     } else {
                                         if ($output->getVerbosity() > 2) {
                                             $output->writeln("Discarding Msg for User: <info>".$user->getUsername()."</info> .. no connection");
@@ -203,5 +175,40 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             return -1;
         }
+    }
+
+    /**
+     * @param Message $message
+     * @param Connection $connection
+     * @param OutputInterface $output
+     */
+    protected function send(Message $message, Connection $connection, OutputInterface $output)
+    {
+        $message = $this->getContainer()->get('mopa_feed.message_helper')->decorate($message, array($connection->getDataType()));
+        // this is an "external endpoint so we need to use a real serializer here
+        // json_decode to reform for Payload->encode()
+        $msg = json_decode(
+
+            $this->getContainer()->get('jms_serializer')->serialize($message, // using the full serializer feature set
+                'json', SerializationContext::create()->setGroups("mopa_feed_websockets")
+            )
+        );
+
+        $payload = new Payload($message->getEvent(), $msg);
+
+        if (OutputInterface::VERBOSITY_NORMAL <= $output->getVerbosity()) {
+            $output->writeln(
+                '<info><comment>Stomp</comment> dispatching '.$message->getEvent().'</info> for conn #'.$connection->getId().' Type: ' .$connection->getDataType(). ''
+            );
+        }
+
+        if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+            $output->writeln(
+                '<info>With data</info>'.var_export($msg, true)
+            );
+        }
+        $this->getContainer()->get('event_dispatcher')->dispatch('mopa_feed.websocket.message',
+            new ConnectionEvent($connection, $payload)
+        );
     }
 }
