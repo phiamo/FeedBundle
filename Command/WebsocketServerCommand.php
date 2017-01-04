@@ -6,7 +6,9 @@ use FOS\UserBundle\Model\UserInterface;
 use Mopa\Bundle\FeedBundle\Entity\Message;
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
+use React\Stomp\AckResolver;
 use React\Stomp\Client;
+use React\Stomp\Protocol\Frame;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -19,6 +21,15 @@ use JMS\Serializer\SerializationContext;
 /**
  * Class WebsocketServerCommand
  * @package Mopa\Bundle\FeedBundle\Command
+ *
+ * If any timeouts in doctrine occur try catch an refetch
+ * $em = $this->getContainer()->get('doctrine')->getManager();
+ * if ($em->getConnection()->ping() === false) {
+ *     $em->getConnection()->close();
+ *     $em->getConnection()->connect();
+ *     $ackResolver->nack();
+ *     return
+ * }
  */
 class WebsocketServerCommand extends ContainerAwareCommand
 {
@@ -110,7 +121,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * Gets the connections its relevant to determined by user_id
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
-                        $stompClient->subscribe('/queue/websockets', function ($frame) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output)
+                        $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output)
                         {
                             $tmp = json_decode($frame->body, true);
 
@@ -170,6 +181,8 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                     }
                                 }
                             }
+
+                            $ackResolver->ack();
                         });
                     } catch (\Exception $e) { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf('Catched <error>%s</error>', $e->getMessage()));
