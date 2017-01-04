@@ -56,8 +56,9 @@
      */
     var token;
     var response_data_type;
+    var broadcastTopics = [];
+
     /**
-     *
      * @param {object} config
      * @constructor
      */
@@ -70,6 +71,10 @@
         }
         this.config = config;
         response_data_type = config.response_data_type;
+
+        if (typeof config['broadcastTopics'] == 'object') {
+            broadcastTopics = config['broadcastTopics'];
+        }
     };
     
     /**
@@ -91,6 +96,7 @@
         socket.onerror = function(e) { invokeEventHandlers.call(self, 'socket.error', e); };
         socket.onopen = function(e) { invokeEventHandlers.call(self, 'socket.open', e); };
     };
+
     /**
      * Emits an event to the underlying websocket. Returns true on success, false on error.
      *
@@ -182,7 +188,11 @@
 
     // socket.open hook
     registerEventHandler('socket.open', function() {
-        this.emit('socket.auth.request', {token: token, data_type: response_data_type});
+        var config = {token: token, data_type: response_data_type};
+        if(broadcastTopics.length > 0) {
+            config['broadcastTopics'] = broadcastTopics;
+        }
+        this.emit('socket.auth.request', config);
     });
     // socket.auth.success hook
     registerEventHandler('socket.auth.success', function(client) {

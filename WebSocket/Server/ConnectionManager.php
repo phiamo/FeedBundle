@@ -99,8 +99,12 @@ class ConnectionManager extends BaseConnectionManager
 
         if (null !== $client = $this->clientProvider->findByAccessToken($accessToken)) {
             $connection->setClient($client);
+
             $type = @$data["data_type"];
             $connection->setDataType($type);
+
+            $topics = (array)@$data["broadcastTopics"];
+            $connection->setBroadcastTopics($topics);
 
             return true;
         }

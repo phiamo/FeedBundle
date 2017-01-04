@@ -23,6 +23,11 @@ class Connection extends BaseConnection
     protected $dataType = 'txt'; // default
 
     /**
+     * @var array
+     */
+    protected $broadcastTopics = [];
+
+    /**
      * @return string
      */
     public function getDataType()
@@ -38,5 +43,21 @@ class Connection extends BaseConnection
         if (in_array($type, self::dataTypes)) { // getting null or smth else
             $this->dataType = $type;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getBroadcastTopics()
+    {
+        return $this->broadcastTopics;
+    }
+
+    /**
+     * @param array $broadcastTopics
+     */
+    public function setBroadcastTopics($broadcastTopics)
+    {
+        $this->broadcastTopics = $broadcastTopics;
     }
 }

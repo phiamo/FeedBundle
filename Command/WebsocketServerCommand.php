@@ -129,7 +129,19 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
                             if(!$user && $message->isBroadcast()) {
                                 $output->writeln("<info>Broadcasting from: ".$message->getEmittingUser()->getUsername()."</info>");
+                                /** @var Connection $connection */
                                 foreach($connectionManager->getConnections() as $connection) {
+                                    if($message->isBroadcast() && count($message->getBroadcastTopics()) > 0) {
+                                        $send = false;
+                                        foreach ($message->getBroadcastTopics() as $topic) {
+                                            if (in_array($topic, $connection->getBroadcastTopics())){
+                                                $send = true;
+                                            }
+                                        }
+                                        if(!$send) {
+                                            continue;
+                                        }
+                                    }
                                     $this->send($message, $connection, $output);
                                 }
                             }elseif ($user && $connectionManager->hasClientId($user->getId())) {

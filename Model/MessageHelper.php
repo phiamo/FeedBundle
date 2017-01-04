@@ -149,6 +149,7 @@ class MessageHelper
         if($prefix = $message->getTemplatePrefix()){
             return $prefix;
         }
+
         return $this->templatePrefix;
     }
 }

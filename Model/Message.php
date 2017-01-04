@@ -115,6 +115,11 @@ abstract class Message
     protected $broadcast = false;
 
     /**
+     * @var array
+     */
+    protected $broadcastTopics = [];
+
+    /**
      * @param string $event
      * @param UserInterface $user
      * @param UserInterface $emittingUser
@@ -323,6 +328,22 @@ abstract class Message
     public function setDecoratorService($decoratorService)
     {
         $this->decoratorService = $decoratorService;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBroadcastTopics()
+    {
+        return $this->broadcastTopics;
+    }
+
+    /**
+     * @param array $broadcastTopics
+     */
+    public function setBroadcastTopic(array $broadcastTopics)
+    {
+        $this->broadcastTopics = $broadcastTopics;
     }
 
     /**
