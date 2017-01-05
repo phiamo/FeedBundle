@@ -153,6 +153,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                             continue;
                                         }
                                     }
+                                    $message->setUser($connection->getClient());
                                     $this->send($message, $connection, $output);
                                 }
                             }elseif ($user && $connectionManager->hasClientId($user->getId())) {
