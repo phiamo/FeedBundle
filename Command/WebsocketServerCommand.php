@@ -196,9 +196,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
             return 0;
         } catch (\Exception $e) {
             $output->writeln(sprintf("<error>Finally: %s</error>", $e->getMessage()));
-            $output->writeln(sprintf("Trace: \n%s", $e->getTraceAsString()));
-
-            return -1;
+            throw $e;
         }
     }
 
@@ -216,7 +214,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $this->getContainer()->get('jms_serializer')->serialize($message, // using the full serializer feature set
                 'json', SerializationContext::create()->setGroups("mopa_feed_websockets")
-            )
+            ), true
         );
 
         $payload = new Payload($message->getEvent(), $msg);
@@ -229,7 +227,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
         if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
             $output->writeln(
-                '<info>With data</info>'.var_export($msg, true)
+                '<info>With data: </info>'.var_export($msg, true)
             );
         }
         $this->getContainer()->get('event_dispatcher')->dispatch('mopa_feed.websocket.message',
