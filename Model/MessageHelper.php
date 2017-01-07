@@ -66,6 +66,7 @@ class MessageHelper
         if (null !== $message->getFeedItem()) {
             $message->setData($message->getFeedItem()->getMessageData());
         }
+
         if ($message->getDecorate()) {
             if($message->getDecoratorService() === 'templating'){
                 return $this->render($message, $formats);

@@ -5,7 +5,6 @@ namespace Mopa\Bundle\FeedBundle\Command;
 use FOS\UserBundle\Model\UserInterface;
 use Mopa\Bundle\FeedBundle\Entity\Message;
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
-use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
@@ -102,14 +101,15 @@ class WebsocketServerCommand extends ContainerAwareCommand
                 'passcode' => $rpass
             ));
 
-            // fetching services, no need to do in the loop
-            $eventDispatcher = $this->getContainer()->get('event_dispatcher');
+
+
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
-            $messageHelper = $this->getContainer()->get('mopa_feed.message_helper');
+            $loginManager = $this->getContainer()->get('fos_user.security.login_manager');
             $serializer = $this->getContainer()->get('jms_serializer');
+            // fetching services, no need to do in the loop
             $stompClient
                 ->connect()
-                ->then(function (Client $stompClient) use ($output, $connectionManager, $messageHelper, $eventDispatcher, $serializer)
+                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $loginManager)
                 {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
@@ -121,11 +121,14 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * Gets the connections its relevant to determined by user_id
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
-                        $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver) use ($connectionManager, $messageHelper, $eventDispatcher, $serializer, $output)
+                        $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver)
+                        use ($output, $serializer, $connectionManager, $loginManager)
                         {
                             $tmp = json_decode($frame->body, true);
 
-                            $output->writeln('Got frame: '.$frame->body);
+                            if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                                $output->writeln('Got frame: ' . $frame->body);
+                            }
 
                             //this comes internally via jms serializer
                             /** @var Message $message */
@@ -138,11 +141,20 @@ class WebsocketServerCommand extends ContainerAwareCommand
                             /** @var UserInterface $user */
                             $user = $message->getUser();
 
-                            if(!$user && $message->isBroadcast()) {
+                            if($message->isBroadcast()) {
                                 $output->writeln("<info>Broadcasting from: ".$message->getEmittingUser()->getUsername()."</info>");
+
                                 /** @var Connection $connection */
                                 foreach($connectionManager->getConnections() as $connection) {
-                                    if($message->isBroadcast() && count($message->getBroadcastTopics()) > 0) {
+                                    if($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                        $output->writeln("<info>Broadcasting to: ".$connection->getClient()->getUsername()."</info>");
+                                    }
+
+                                    $message->setUser($connection->getClient());
+
+                                    $loginManager->loginUser($message->getFirewallName(), $connection->getClient());
+
+                                    if(count($message->getBroadcastTopics()) > 0) {
                                         $send = false;
                                         foreach ($message->getBroadcastTopics() as $topic) {
                                             if (in_array($topic, $connection->getBroadcastTopics())){
@@ -153,7 +165,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                             continue;
                                         }
                                     }
-                                    $message->setUser($connection->getClient());
+
                                     $this->send($message, $connection, $output);
                                 }
                             }elseif ($user && $connectionManager->hasClientId($user->getId())) {
@@ -222,11 +234,12 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
         if (OutputInterface::VERBOSITY_NORMAL <= $output->getVerbosity()) {
             $output->writeln(
-                '<info><comment>Stomp</comment> dispatching '.$message->getEvent().'</info> for conn #'.$connection->getId().' Type: ' .$connection->getDataType(). ''
+                '<info><comment>Stomp</comment> dispatching '.$message->getEvent().'</info>
+                    for conn #'.$connection->getId().' Type: ' .$connection->getDataType(). ''
             );
         }
 
-        if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+        if($output->getVerbosity() > OutputInterface::VERBOSITY_DEBUG) {
             $output->writeln(
                 '<info>With data: </info>'.var_export($msg, true)
             );

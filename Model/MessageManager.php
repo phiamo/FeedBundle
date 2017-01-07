@@ -143,8 +143,6 @@ class MessageManager
             $message->setData($obj);
         }
 
-        $this->messageHelper->decorate($message); // decorating messages so templates know them
-
         $serialized = $this->serializer->serialize($message, 'json',
             SerializationContext::create()->setGroups("mopa_feed_websockets.internal")
         );

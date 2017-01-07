@@ -120,6 +120,11 @@ abstract class Message
     protected $broadcastTopics = [];
 
     /**
+     * @var string
+     */
+    protected $firewallName = null;
+
+    /**
      * @param string $event
      * @param UserInterface $user
      * @param UserInterface $emittingUser
@@ -478,5 +483,13 @@ abstract class Message
     public function isBroadcast()
     {
         return $this->broadcast;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirewallName()
+    {
+        return $this->firewallName;
     }
 }
