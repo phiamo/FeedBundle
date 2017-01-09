@@ -12,7 +12,6 @@
 	"autoload" : {
       "psr-4": { "Mopa\\Bundle\\FeedBundle\\": "" }
 	},
-	"target-dir" : "Mopa/Bundle/FeedBundle",
 	"require" : {
       "php" : ">=5.3.2",
       "php-amqplib/rabbitmq-bundle": "@stable",
