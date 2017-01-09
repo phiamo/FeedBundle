@@ -1,0 +1,11 @@
+Mopa\Bundle\FeedBundle\Model\AnonymousUser:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            type: string
+            groups: ["mopa_feed_websockets.internal"]
+        accessToken:
+            expose: true
+            type: string
+            groups: ["mopa_feed_websockets.internal"]

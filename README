@@ -1,0 +1,19 @@
+Mopa Feed Bundle
+================
+
+This bundle comes with no guarantee :-)
+
+
+Its intended to make websocket usage simpler and was orginating from sending user news feeds.
+Now it can handle quite a bit more and even power chats
+
+It is relying on rabbitmq to allow to send websocket messages from symfony2 applications
+ that are not running in the same process as the websocket.
+
+So you are abled to inform connected user applications asyncronously.
+
+this bundle is already used in a few applications and might be heavily over engineered and untestet (phpunit).
+
+One of the main goals was reusability of templates:
+ so you can instruct the system to use templates connected with messages render
+ them server sided in twig and send them then via websockets to "just use" the output in your app

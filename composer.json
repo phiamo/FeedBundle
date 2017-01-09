@@ -1,0 +1,28 @@
+{
+	"name" : "mopa/feed-bundle",
+	"type" : "symfony-bundle",
+	"description" : "Websocket and Feedfunctionality",
+    "licence": "MIT",
+	"version" : "master",
+	"authors" : [{
+        "name" : "Philipp A. Mohrenweiser",
+        "email" : "phiamo@googlemail.com"
+      }
+	],
+	"autoload" : {
+      "psr-4": { "Mopa\\Bundle\\FeedBundle\\": "" }
+	},
+	"target-dir" : "Mopa/Bundle/FeedBundle",
+	"require" : {
+      "php" : ">=5.3.2",
+      "php-amqplib/rabbitmq-bundle": "@stable",
+      "react/stomp": "@stable",
+      "p2/ratchet-bundle": "dev-fix-bridge as v1.0.4"
+	},
+    "repositories": [
+      {
+        "type": "vcs",
+        "url": "https://github.com/phiamo/ratchet-bundle.git"
+      }
+    ]
+}

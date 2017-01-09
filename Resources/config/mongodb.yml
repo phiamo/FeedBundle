@@ -1,0 +1,12 @@
+parameters:
+    mopa_feed.message_manager.class: Mopa\Bundle\FeedBundle\Model\MessageManager
+
+services:
+    mopa_feed.message_manager:
+        class: "%mopa_feed.message_manager.class%"
+        arguments:
+            - "@old_sound_rabbit_mq.mopa_feed_websockets_producer"
+            - "@doctrine.odm.mongodb.document_manager"
+            - "@jms_serializer"
+            - "@mopa_feed.message_helper"
+            - "@logger"

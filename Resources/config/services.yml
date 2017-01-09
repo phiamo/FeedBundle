@@ -1,0 +1,16 @@
+parameters:
+    mopa_feed.message_helper.class: Mopa\Bundle\FeedBundle\Model\MessageHelper
+
+services:
+    mopa_feed.message_helper:
+        class: "%mopa_feed.message_helper.class%"
+        lazy: true
+        arguments:
+            - "@service_container"
+            - "%mopa_feed.message.template_prefix%"
+
+    mopa_feed.websocket.application:
+        class: Mopa\Bundle\FeedBundle\WebSocket\Application
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: p2_ratchet.application }

@@ -1,0 +1,48 @@
+Mopa\Bundle\FeedBundle\Model\Message:
+    exclusion_policy: ALL
+    properties:
+        id:
+            expose: true
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        recieverId:
+            expose: true
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        class:
+            expose: true
+            type: string
+            groups: ["mopa_feed_websockets.internal"]
+        created:
+            expose: true
+            type: DateTime
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        save:
+            expose: true
+            type: boolean
+            groups: ["mopa_feed_websockets.internal"]
+        decorate:
+            expose: true
+            type: boolean
+            groups: ["mopa_feed_websockets.internal"]
+        ttl:
+            expose: true
+            type: integer
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        hideAfter:
+            expose: true
+            type: integer
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        event:
+            expose: true
+            type: string
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+        serializerGroup:
+            expose: true
+            type: string
+            groups: ["mopa_feed_websockets.internal"]
+        data:
+            expose: true
+            type: array
+            accessor:
+                getter: "getData"
+            groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
+
