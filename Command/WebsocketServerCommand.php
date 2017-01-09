@@ -104,12 +104,11 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
 
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
-            $loginManager = $this->getContainer()->get('fos_user.security.login_manager');
             $serializer = $this->getContainer()->get('jms_serializer');
             // fetching services, no need to do in the loop
             $stompClient
                 ->connect()
-                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $loginManager)
+                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager)
                 {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
@@ -122,12 +121,16 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
                         $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver)
-                        use ($output, $serializer, $connectionManager, $loginManager)
+                        use ($output, $serializer, $connectionManager)
                         {
                             $tmp = json_decode($frame->body, true);
 
                             if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
                                 $output->writeln('Got frame: ' . $frame->body);
+                            }
+
+                            if(!isset($tmp['class'])) {
+                                throw new \Exception('Please define $class property for mopa_feed_websockets.internal serialization');
                             }
 
                             //this comes internally via jms serializer
@@ -151,8 +154,6 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                     }
 
                                     $message->setUser($connection->getClient());
-
-                                    $loginManager->loginUser($message->getFirewallName(), $connection->getClient());
 
                                     if(count($message->getBroadcastTopics()) > 0) {
                                         $send = false;
@@ -217,9 +218,18 @@ class WebsocketServerCommand extends ContainerAwareCommand
      * @param Message $message
      * @param Connection $connection
      * @param OutputInterface $output
+     * @return bool
      */
     protected function send(Message $message, Connection $connection, OutputInterface $output)
     {
+        try{
+            $this->getContainer()->get('fos_user.security.login_manager')->loginUser($message->getFirewallName(), $connection->getClient());
+        }
+        catch(\Exception $e) {
+            $output->writeln('<warning>'.$connection->getClient()->getUsername().' had massive login probs: '.$e->getMessage().'</warning>');
+            return false;
+        }
+
         $message = $this->getContainer()->get('mopa_feed.message_helper')->decorate($message, array($connection->getDataType()));
         // this is an "external endpoint so we need to use a real serializer here
         // json_decode to reform for Payload->encode()
@@ -244,8 +254,11 @@ class WebsocketServerCommand extends ContainerAwareCommand
                 '<info>With data: </info>'.var_export($msg, true)
             );
         }
+
         $this->getContainer()->get('event_dispatcher')->dispatch('mopa_feed.websocket.message',
             new ConnectionEvent($connection, $payload)
         );
+
+        return true;
     }
 }

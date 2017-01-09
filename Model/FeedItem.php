@@ -42,7 +42,6 @@ abstract class FeedItem implements MessageableInterface
 
     /**
      * When a Feeditem was published it gets a message, feedItems not having a message will not be displayed
-     * See BookmarkImport, its async and cant be displayed until the message is added
      *
      * @var $message Message
      */

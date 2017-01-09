@@ -145,14 +145,6 @@ abstract class Message
 
         $this->created = new \DateTime();
 
-        if (null === $emittingUser && null !== $user) {
-            $emittingUser = $user;
-        }
-
-        if (null === $user && null !== $emittingUser) {
-            $user = $emittingUser;
-        }
-
         $this->setUser($user);
         $this->setEmittingUser($emittingUser);
         $this->setEvent($event);

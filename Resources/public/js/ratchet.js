@@ -27,7 +27,7 @@
 /**
  * This is a slightly modfied version of ratchet from Philipp Boes
  * 
- * Changed by: Philipp A. Mohrenweiser <phiamo@googlemail.com> for Booksync
+ * Changed by: Philipp A. Mohrenweiser <phiamo@googlemail.com> for FeedBundle
  */
 (function() {
 
