@@ -14,3 +14,15 @@ services:
         tags:
             - { name: kernel.event_subscriber }
             - { name: p2_ratchet.application }
+
+    mopa_feed.encryption_helper:
+        class: Mopa\Bundle\FeedBundle\WebSocket\Server\EncryptionHelper
+        arguments:
+            - "%kernel.cache_dir%"
+
+    mopa_feed.twig.extension:
+        class: Mopa\Bundle\FeedBundle\Twig\FeedExtension
+        arguments:
+            - "@mopa_feed.encryption_helper"
+        tags:
+            - { name: twig.extension }

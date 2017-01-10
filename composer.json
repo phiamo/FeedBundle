@@ -21,6 +21,9 @@
       "react/stomp": "@stable",
       "p2/ratchet-bundle": "dev-fix-bridge as v1.0.4"
 	},
+    "suggest": {
+      "defuse/php-encryption": "~2"
+    },
     "repositories": [
       {
         "type": "vcs",

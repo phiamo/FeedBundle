@@ -7,6 +7,8 @@
 
 namespace Mopa\Bundle\FeedBundle;
 
+use Mopa\Bundle\FeedBundle\DependencyInjection\CompilerPass\P2CompilerPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -15,4 +17,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class MopaFeedBundle extends Bundle
 {
+    /**
+     * @param ContainerBuilder $container
+     */
+    public function build(ContainerBuilder $container)
+    {
+        $container->addCompilerPass(new P2CompilerPass());
+    }
 }

@@ -10,6 +10,7 @@ namespace Mopa\Bundle\FeedBundle\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 use Symfony\Component\DependencyInjection\Loader;
 
@@ -32,9 +33,13 @@ class MopaFeedExtension extends Extension
         $loader->load('services.yml');
         $loader->load(sprintf('%s.yml', $config['db_driver']));
 
+        if(!empty($config['key_dir'])) {
+            $container->setParameter('mopa_feed.key_dir', $config['key_dir']);
+        }
+
+
         $container->setParameter('mopa_feed.message.template_prefix', $config['message_template_prefix']);
         $container->setParameter('mopa_feed.message.class', $config['message_class']);
-
 
     }
 }
