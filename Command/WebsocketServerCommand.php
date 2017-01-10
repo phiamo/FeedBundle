@@ -149,6 +149,11 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
                                 /** @var Connection $connection */
                                 foreach($connectionManager->getConnections() as $connection) {
+
+                                    if(!$connection->getClient()) {
+                                        $output->writeln("<warning>No client for: ".$connection->getId()."</warning>");
+                                        continue;
+                                    }
                                     if($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
                                         $output->writeln("<info>Broadcasting to: ".$connection->getClient()->getUsername()."</info>");
                                     }
