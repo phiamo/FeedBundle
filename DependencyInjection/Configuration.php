@@ -42,6 +42,9 @@ class Configuration implements ConfigurationInterface
                 ->scalarNode('message_class')
                     ->isRequired()
                 ->end()
+                ->scalarNode('key_dir')
+                    ->defaultValue('%kernel.cache_dir%')
+                ->end()
             ->end()
         ;
         // Here you should define the parameters that are allowed to

@@ -16,7 +16,16 @@ use FOS\UserBundle\Model\UserInterface;
 class ConnectionManager extends BaseConnectionManager
 {
     /**
+<<<<<<< HEAD
      * @param  SocketConnection                                                                             $socketConnection
+=======
+     * @var EncryptionHelper
+     */
+    protected $encryptionHelper;
+
+    /**
+     * @param  SocketConnection $socketConnection
+>>>>>>> feature/cryptanono
      * @return bool|Connection|\P2\Bundle\RatchetBundle\WebSocket\Connection\Connection|ConnectionInterface
      */
     public function addConnection(SocketConnection $socketConnection)
@@ -103,19 +112,35 @@ class ConnectionManager extends BaseConnectionManager
             $type = @$data["data_type"];
             $connection->setDataType($type);
 
-            $topics = (array)@$data["broadcastTopics"];
-            $connection->setBroadcastTopics($topics);
+            if(array_key_exists('broadcastTopics', $data)) {
+                $topics = (array)@$data["broadcastTopics"];
+                $connection->setBroadcastTopics($topics);
+            }
 
             return true;
         }
 
-        if ($accessToken != '') {
-            $client = new AnonymousUser($accessToken);
-            $connection->setClient($client);
+        if($accessToken != '') {
 
-            return true;
+            $decryptedAccessToken = $this->encryptionHelper->decrypt($accessToken);
+
+            if($decryptedAccessToken) {
+
+                $client = new AnonymousUser($decryptedAccessToken);
+                $connection->setClient($client);
+
+                return true;
+            }
         }
 
         return false;
+    }
+
+    /**
+     * @param EncryptionHelper $encryptionHelper
+     */
+    public function setEncryptionHelper($encryptionHelper)
+    {
+        $this->encryptionHelper = $encryptionHelper;
     }
 }

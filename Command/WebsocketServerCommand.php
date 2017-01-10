@@ -3,7 +3,7 @@
 namespace Mopa\Bundle\FeedBundle\Command;
 
 use FOS\UserBundle\Model\UserInterface;
-use Mopa\Bundle\FeedBundle\Entity\Message;
+use Mopa\Bundle\FeedBundle\Model\Message;
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
 use React\Stomp\AckResolver;
 use React\Stomp\Client;
@@ -222,12 +222,13 @@ class WebsocketServerCommand extends ContainerAwareCommand
      */
     protected function send(Message $message, Connection $connection, OutputInterface $output)
     {
-        try{
-            $this->getContainer()->get('fos_user.security.login_manager')->loginUser($message->getFirewallName(), $connection->getClient());
-        }
-        catch(\Exception $e) {
-            $output->writeln('<warning>'.$connection->getClient()->getUsername().' had massive login probs: '.$e->getMessage().'</warning>');
-            return false;
+        if($message->getFirewallName()) {
+            try {
+                $this->getContainer()->get('fos_user.security.login_manager')->loginUser($message->getFirewallName(), $connection->getClient());
+            } catch (\Exception $e) {
+                $output->writeln('<warning>' . $connection->getClient()->getUsername() . ' had massive login probs: ' . $e->getMessage() . '</warning>');
+                return false;
+            }
         }
 
         $message = $this->getContainer()->get('mopa_feed.message_helper')->decorate($message, array($connection->getDataType()));
