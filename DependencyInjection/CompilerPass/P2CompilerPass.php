@@ -27,6 +27,7 @@ class P2CompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $container->getDefinition('p2_ratchet.websocket.connection_manager')
-            ->addMethodCall('setEncryptionHelper', [new Reference('mopa_feed.encryption_helper')]);
+            ->addMethodCall('setEncryptionHelper', [new Reference('mopa_feed.encryption_helper')])
+            ->addMethodCall('setRegistry', [new Reference('doctrine')]);
     }
 }

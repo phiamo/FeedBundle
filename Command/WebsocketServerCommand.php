@@ -2,6 +2,7 @@
 
 namespace Mopa\Bundle\FeedBundle\Command;
 
+use Doctrine\DBAL\DBALException;
 use FOS\UserBundle\Model\UserInterface;
 use Mopa\Bundle\FeedBundle\Model\Message;
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
@@ -105,7 +106,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
             $serializer = $this->getContainer()->get('jms_serializer');
-            // fetching services, no need to do in the loop
+
             $stompClient
                 ->connect()
                 ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager)
@@ -123,87 +124,104 @@ class WebsocketServerCommand extends ContainerAwareCommand
                         $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver)
                         use ($output, $serializer, $connectionManager)
                         {
-                            $tmp = json_decode($frame->body, true);
+                            try {
+                                $tmp = json_decode($frame->body, true);
 
-                            if($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
-                                $output->writeln('Got frame: ' . $frame->body);
-                            }
+                                if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
+                                    $output->writeln('Got frame: ' . $frame->body);
+                                }
 
-                            if(!isset($tmp['class'])) {
-                                throw new \Exception('Please define $class property for mopa_feed_websockets.internal serialization');
-                            }
+                                if (!isset($tmp['class'])) {
+                                    throw new \Exception('Please define $class property for mopa_feed_websockets.internal serialization');
+                                }
 
-                            //this comes internally via jms serializer
-                            /** @var Message $message */
-                            $message = $serializer->deserialize(
+                                //this comes internally via jms serializer
+                                /** @var Message $message */
+                                $message = $serializer->deserialize(
                                     $frame->body,
                                     $tmp['class'],
                                     'json'
-                            );
+                                );
 
-                            /** @var UserInterface $user */
-                            $user = $message->getUser();
+                                /** @var UserInterface $user */
+                                $user = $message->getUser();
 
-                            if($message->isBroadcast()) {
-                                $output->writeln("<info>Broadcasting from: ".$message->getEmittingUser()->getUsername()."</info>");
+                                if ($message->isBroadcast()) {
+                                    $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . "</info>");
 
-                                /** @var Connection $connection */
-                                foreach($connectionManager->getConnections() as $connection) {
+                                    /** @var Connection $connection */
+                                    foreach ($connectionManager->getConnections() as $connection) {
 
-                                    if(!$connection->getClient()) {
-                                        $output->writeln("<warning>No client for: ".$connection->getId()."</warning>");
-                                        continue;
-                                    }
-                                    if($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
-                                        $output->writeln("<info>Broadcasting to: ".$connection->getClient()->getUsername()."</info>");
-                                    }
-
-                                    $message->setUser($connection->getClient());
-
-                                    if(count($message->getBroadcastTopics()) > 0) {
-                                        $send = false;
-                                        foreach ($message->getBroadcastTopics() as $topic) {
-                                            if (in_array($topic, $connection->getBroadcastTopics())){
-                                                $send = true;
-                                            }
-                                        }
-                                        if(!$send) {
+                                        if (!$connection->getClient()) {
+                                            $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
                                             continue;
                                         }
+                                        if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                            $output->writeln("<info>Broadcasting to: " . $connection->getClient()->getUsername() . "</info>");
+                                        }
+
+                                        $message->setUser($connection->getClient());
+
+                                        if (count($message->getBroadcastTopics()) > 0) {
+                                            $send = false;
+                                            foreach ($message->getBroadcastTopics() as $topic) {
+                                                if (in_array($topic, $connection->getBroadcastTopics())) {
+                                                    $send = true;
+                                                }
+                                            }
+                                            if (!$send) {
+                                                continue;
+                                            }
+                                        }
+
+                                        $this->send($message, $connection, $output);
+                                    }
+                                } elseif ($user && $connectionManager->hasClientId($user->getId())) {
+                                    if ($output->getVerbosity() > 2) {
+                                        $output->writeln("Having Client Id for User: <info>" . $user->getUsername() . "</info>");
                                     }
 
-                                    $this->send($message, $connection, $output);
-                                }
-                            }elseif ($user && $connectionManager->hasClientId($user->getId())) {
-                                if ($output->getVerbosity() > 2) {
-                                    $output->writeln("Having Client Id for User: <info>".$user->getUsername()."</info>");
-                                }
+                                    $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
 
-                                $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
-
-                                /** @var Connection $connection */
-                                foreach ($connections as $connection) {
-                                    if ($connection) {
-                                        $this->send($message, $connection, $output);
-                                    } else {
-                                        if ($output->getVerbosity() > 2) {
-                                            $output->writeln("Discarding Msg for User: <info>".$user->getUsername()."</info> .. no connection");
+                                    /** @var Connection $connection */
+                                    foreach ($connections as $connection) {
+                                        if ($connection) {
+                                            $this->send($message, $connection, $output);
+                                        } else {
+                                            if ($output->getVerbosity() > 2) {
+                                                $output->writeln("Discarding Msg for User: <info>" . $user->getUsername() . "</info> .. no connection");
+                                            }
+                                        }
+                                    }
+                                } else {
+                                    if ($output->getVerbosity() > 1) {
+                                        if (!$user) {
+                                            $output->writeln("Couldnt get User for: <info>" . $frame->body . "</info>");
+                                        } else {
+                                            $output->writeln("No Connection for User: <info>" . $user->getId() . "</info>");
                                         }
                                     }
                                 }
-                            } else {
-                                if ($output->getVerbosity() > 1) {
-                                    if (!$user) {
-                                        $output->writeln("Couldnt get User for: <info>".$frame->body."</info>");
-                                    } else {
-                                        $output->writeln("No Connection for User: <info>".$user->getId()."</info>");
+
+                                $ackResolver->ack();
+                            }
+                            catch(DBALException $e) {
+                                /**
+                                 * If any timeouts in doctrine occur
+                                 * @var \Doctrine\DBAL\Connection $connection
+                                 */
+                                foreach($this->getContainer()->get('doctrine')->getConnections() as $connection) {
+                                    if ($connection->ping() === false) {
+                                        $connection->close();
+                                        $connection->connect();
                                     }
                                 }
+                                // we dont wanna loose it, so we hope we wont generate a endless loop
+                                $ackResolver->nack();
                             }
-
-                            $ackResolver->ack();
                         });
-                    } catch (\Exception $e) { // do not exit the loop due to ANY failure in here ... ;(
+                    }
+                    catch (\Exception $e) { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf('Catched <error>%s</error>', $e->getMessage()));
                         if ($output->getVerbosity() > 2) {
                             $output->writeln(sprintf("Trace: \n%s", $e->getTraceAsString()));

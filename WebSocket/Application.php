@@ -32,6 +32,7 @@ class Application implements ApplicationInterface
     {
         $payload = $event->getPayload();
         $data = $payload->getData();
+
         $event->getConnection()->emit(
             new Payload(
                 'mopa_feed.'.$payload->getEvent(),

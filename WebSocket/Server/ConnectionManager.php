@@ -2,6 +2,7 @@
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Mopa\Bundle\FeedBundle\Model\AnonymousUser;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnectionManager;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
@@ -16,16 +17,17 @@ use FOS\UserBundle\Model\UserInterface;
 class ConnectionManager extends BaseConnectionManager
 {
     /**
-<<<<<<< HEAD
-     * @param  SocketConnection                                                                             $socketConnection
-=======
      * @var EncryptionHelper
      */
     protected $encryptionHelper;
 
     /**
+     * @var Registry
+     */
+    protected $registry;
+
+    /**
      * @param  SocketConnection $socketConnection
->>>>>>> feature/cryptanono
      * @return bool|Connection|\P2\Bundle\RatchetBundle\WebSocket\Connection\Connection|ConnectionInterface
      */
     public function addConnection(SocketConnection $socketConnection)
@@ -95,6 +97,19 @@ class ConnectionManager extends BaseConnectionManager
      */
     public function authenticate(ConnectionInterface $connection, $data)
     {
+        /**
+         * If we have a registry and any timeouts in doctrine occur
+         * @var \Doctrine\DBAL\Connection $dbalConnection
+         */
+        if($this->registry) {
+            foreach ($this->registry->getConnections() as $dbalConnection) {
+                if ($dbalConnection->ping() === false) {
+                    $dbalConnection->close();
+                    $dbalConnection->connect();
+                }
+            }
+        }
+
         if (!isset($data["token"])) {
             $accessToken = '';
         }
@@ -142,5 +157,13 @@ class ConnectionManager extends BaseConnectionManager
     public function setEncryptionHelper($encryptionHelper)
     {
         $this->encryptionHelper = $encryptionHelper;
+    }
+
+    /**
+     * @param null|Registry $registry
+     */
+    public function setRegistry(Registry $registry = null)
+    {
+        $this->registry = $registry;
     }
 }
