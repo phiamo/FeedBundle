@@ -2,7 +2,7 @@
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Mopa\Bundle\FeedBundle\Model\AnonymousUser;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnectionManager;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
@@ -22,7 +22,7 @@ class ConnectionManager extends BaseConnectionManager
     protected $encryptionHelper;
 
     /**
-     * @var Registry
+     * @var ManagerRegistry
      */
     protected $registry;
 
@@ -103,7 +103,7 @@ class ConnectionManager extends BaseConnectionManager
          */
         if($this->registry) {
             foreach ($this->registry->getConnections() as $dbalConnection) {
-                if ($dbalConnection->ping() === false) {
+                if (method_exists($dbalConnection, 'ping') && $dbalConnection->ping() === false) {
                     $dbalConnection->close();
                     $dbalConnection->connect();
                 }
@@ -160,9 +160,9 @@ class ConnectionManager extends BaseConnectionManager
     }
 
     /**
-     * @param null|Registry $registry
+     * @param null|ManagerRegistry $registry
      */
-    public function setRegistry(Registry $registry = null)
+    public function setRegistry(ManagerRegistry $registry = null)
     {
         $this->registry = $registry;
     }

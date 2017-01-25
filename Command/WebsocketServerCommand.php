@@ -102,8 +102,6 @@ class WebsocketServerCommand extends ContainerAwareCommand
                 'passcode' => $rpass
             ));
 
-
-
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
             $serializer = $this->getContainer()->get('jms_serializer');
 

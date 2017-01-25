@@ -3,7 +3,7 @@
 namespace Mopa\Bundle\FeedBundle\WebSocket;
 
 use P2\Bundle\RatchetBundle\WebSocket\ConnectionEvent;
-use P2\Bundle\RatchetBundle\WebSocket\Server\ApplicationInterface;
+use P2\Bundle\RatchetBundle\WebSocket\ApplicationInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Payload;
 
 /**
