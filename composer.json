@@ -16,7 +16,7 @@
       "php" : ">=5.3.2",
       "php-amqplib/rabbitmq-bundle": "@stable",
       "react/stomp": "@stable",
-      "p2/ratchet-bundle": "dev-fix-ratchet-035 as v1.0.4",
+      "p2/ratchet-bundle": "dev-fix-ratchet-036 as v1.0.4",
       "defuse/php-encryption": "~2"
 	},
     "repositories": [
