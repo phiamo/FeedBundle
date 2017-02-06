@@ -21,15 +21,6 @@ use JMS\Serializer\SerializationContext;
 /**
  * Class WebsocketServerCommand
  * @package Mopa\Bundle\FeedBundle\Command
- *
- * If any timeouts in doctrine occur try catch an refetch
- * $em = $this->getContainer()->get('doctrine')->getManager();
- * if ($em->getConnection()->ping() === false) {
- *     $em->getConnection()->close();
- *     $em->getConnection()->connect();
- *     $ackResolver->nack();
- *     return
- * }
  */
 class WebsocketServerCommand extends ContainerAwareCommand
 {
@@ -42,6 +33,20 @@ class WebsocketServerCommand extends ContainerAwareCommand
      * @var string
      */
     const ARG_PORT = 'port';
+
+    private function establishConnection()
+    {
+        /**
+         * If any timeouts in doctrine occur
+         * @var \Doctrine\DBAL\Connection $connection
+         */
+        foreach($this->getContainer()->get('doctrine')->getConnections() as $connection) {
+            if ($connection->ping() === false) {
+                $connection->close();
+                $connection->connect();
+            }
+        }
+    }
 
     /**
      * {@inheritDoc}
@@ -204,16 +209,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                 $ackResolver->ack();
                             }
                             catch(DBALException $e) {
-                                /**
-                                 * If any timeouts in doctrine occur
-                                 * @var \Doctrine\DBAL\Connection $connection
-                                 */
-                                foreach($this->getContainer()->get('doctrine')->getConnections() as $connection) {
-                                    if ($connection->ping() === false) {
-                                        $connection->close();
-                                        $connection->connect();
-                                    }
-                                }
+                                $this->establishConnection();
                                 // we dont wanna loose it, so we hope we wont generate a endless loop
                                 $ackResolver->nack();
                             }

@@ -9,6 +9,9 @@
 namespace Mopa\Bundle\FeedBundle\DependencyInjection\CompilerPass;
 
 
+use Mopa\Bundle\FeedBundle\WebSocket\Server\Bridge;
+use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
+use Mopa\Bundle\FeedBundle\WebSocket\Server\ConnectionManager;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
@@ -26,7 +29,12 @@ class P2CompilerPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
+        $container->setParameter('p2_ratchet.websocket.server_bridge.class', Bridge::class);
+        $x = $container->getParameter('p2_ratchet.websocket.server_bridge.class');
+
+        $container->setParameter('p2_ratchet.websocket.connection.class', Connection::class);
         $container->getDefinition('p2_ratchet.websocket.connection_manager')
+            ->setClass(ConnectionManager::class)
             ->addMethodCall('setEncryptionHelper', [new Reference('mopa_feed.encryption_helper')])
             ->addMethodCall('setRegistry', [new Reference('doctrine')]);
     }
