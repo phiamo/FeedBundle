@@ -138,13 +138,20 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                     throw new \Exception('Please define $class property for mopa_feed_websockets.internal serialization');
                                 }
 
-                                //this comes internally via jms serializer
-                                /** @var Message $message */
-                                $message = $serializer->deserialize(
-                                    $frame->body,
-                                    $tmp['class'],
-                                    'json'
-                                );
+                                try {
+                                    //this comes internally via jms serializer
+                                    /** @var Message $message */
+                                    $message = $serializer->deserialize(
+                                        $frame->body,
+                                        $tmp['class'],
+                                        'json'
+                                    );
+                                }
+                                catch (\ReflectionException $e){
+                                    $output->writeln('<warning>Unknown Class unserialized: '.$e->getMessage());
+                                    $ackResolver->ack();
+                                    return;
+                                }
 
                                 /** @var UserInterface $user */
                                 $user = $message->getUser();
