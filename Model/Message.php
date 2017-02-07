@@ -8,7 +8,6 @@
 namespace Mopa\Bundle\FeedBundle\Model;
 
 use FOS\UserBundle\Model\UserInterface;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Message
@@ -18,8 +17,6 @@ abstract class Message
 {
     /**
      * @var int
-     *
-     * @Serializer\Accessor(getter="getId")
      */
     protected $id;
 

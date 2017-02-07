@@ -3,6 +3,7 @@ Mopa\Bundle\FeedBundle\Model\Message:
     properties:
         id:
             expose: true
+            accessor: "getId"
             groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         recieverId:
             expose: true
@@ -36,6 +37,18 @@ Mopa\Bundle\FeedBundle\Model\Message:
             type: string
             groups: ["mopa_feed_websockets", "mopa_feed_websockets.internal"]
         serializerGroup:
+            expose: true
+            type: string
+            groups: ["mopa_feed_websockets.internal"]
+        broadcast:
+            expose: true
+            type: boolean
+            groups: ["mopa_feed_websockets.internal"]
+        broadcastTopics:
+            expose: true
+            type: array
+            groups: ["mopa_feed_websockets.internal"]
+        firewallName:
             expose: true
             type: string
             groups: ["mopa_feed_websockets.internal"]
