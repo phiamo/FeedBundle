@@ -33,6 +33,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
      * @var string
      */
     const ARG_PORT = 'port';
+    const SERVER_START = 'mopa_feed.websocket_server.start';
 
     private function establishConnection()
     {
@@ -71,6 +72,8 @@ class WebsocketServerCommand extends ContainerAwareCommand
             $output->writeln('Env: '.$this->getContainer()->get('kernel')->getEnvironment());
         }
         try {
+            $this->getContainer()->get('event_dispatcher')->dispatch(self::SERVER_START);
+
             /** @var \P2\Bundle\RatchetBundle\WebSocket\Server\Factory $factory */
             $factory = $this->getContainer()->get('p2_ratchet.websocket.server_factory');
 
@@ -234,6 +237,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                         }
                     }
                 });
+
             $server->run();
 
             return 0;

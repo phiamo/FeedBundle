@@ -2,15 +2,9 @@
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManagerInterface;
-use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use P2\Bundle\RatchetBundle\WebSocket\ConnectionEvent;
-use P2\Bundle\RatchetBundle\WebSocket\Exception\InvalidPayloadException;
-use P2\Bundle\RatchetBundle\WebSocket\Exception\NotManagedConnectionException;
-use P2\Bundle\RatchetBundle\WebSocket\Exception\InvalidEventCallException;
-use P2\Bundle\RatchetBundle\WebSocket\Payload;
 use Psr\Log\LoggerInterface;
 use Ratchet\ConnectionInterface as SocketConnection;
-use Ratchet\MessageComponentInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 /**
