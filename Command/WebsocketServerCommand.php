@@ -259,16 +259,15 @@ class WebsocketServerCommand extends ContainerAwareCommand
             try {
                 $this->getContainer()->get('fos_user.security.login_manager')->loginUser($message->getFirewallName(), $connection->getClient());
             } catch (\Exception $e) {
-                $output->writeln('<warning>' . $connection->getClient()->getUsername() . ' had massive login probs: ' . $e->getMessage() . '</warning>');
+                $output->writeln('<warning>' . $connection->getClient()->getUsername() . ' had unexpected login probs: ' . $e->getMessage() . '</warning>');
                 return false;
             }
         }
 
         $message = $this->getContainer()->get('mopa_feed.message_helper')->decorate($message, array($connection->getDataType()));
-        // this is an "external endpoint so we need to use a real serializer here
+        // this is an "external endpoint" so we need to use a real serializer here
         // json_decode to reform for Payload->encode()
         $msg = json_decode(
-
             $this->getContainer()->get('jms_serializer')->serialize($message, // using the full serializer feature set
                 'json', SerializationContext::create()->setGroups("mopa_feed_websockets")
             ), true
