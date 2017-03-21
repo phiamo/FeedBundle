@@ -1,6 +1,7 @@
 <?php
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
+use Mopa\Bundle\FeedBundle\WebSocket\ConnectionEvents;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManagerInterface;
 use P2\Bundle\RatchetBundle\WebSocket\ConnectionEvent;
 use Psr\Log\LoggerInterface;
@@ -37,16 +38,19 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     public function onClose(SocketConnection $conn)
     {
-        $connection = $this->connectionManager->closeConnection($conn);
 
-        $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_CLOSE, new ConnectionEvent($connection));
+        if($this->connectionManager->hasConnection($conn)) {
+            $connection = $this->connectionManager->closeConnection($conn);
 
-        $this->logger->notice(
-            sprintf(
-                'Closed connection <info>#%s</info> (<comment>%s</comment>)',
-                $connection->getId(),
-                $connection->getRemoteAddress()
-            )
-        );
+            $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_CLOSE, new ConnectionEvent($connection));
+            $this->logger->notice(
+                sprintf(
+                    'Closed connection <info>#%s</info> (<comment>%s</comment>)',
+                    $connection->getId(),
+                    $connection->getRemoteAddress()
+                )
+            );
+        }
+
     }
 }
