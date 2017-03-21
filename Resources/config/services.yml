@@ -8,6 +8,9 @@ services:
         arguments:
             - "@service_container"
             - "%mopa_feed.message.template_prefix%"
+            - "@logger"
+        tags:
+            - { name: monolog.logger, channel: 'mopa_feed.message_helper'}
 
     mopa_feed.websocket.application:
         class: Mopa\Bundle\FeedBundle\WebSocket\Application

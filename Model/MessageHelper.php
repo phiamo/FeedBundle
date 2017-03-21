@@ -8,6 +8,7 @@
 namespace Mopa\Bundle\FeedBundle\Model;
 
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Routing\Router;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -27,6 +28,11 @@ class MessageHelper
     ];
 
     /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
      * @var ContainerInterface
      */
     private $container;
@@ -39,11 +45,13 @@ class MessageHelper
     /**
      * @param ContainerInterface $container
      * @param $templatePrefix
+     * @param LoggerInterface $logger
      */
-    public function __construct(ContainerInterface $container, $templatePrefix)
+    public function __construct(ContainerInterface $container, $templatePrefix, LoggerInterface $logger)
     {
         $this->container = $container;
         $this->templatePrefix = $templatePrefix;
+        $this->logger = $logger;
     }
 
     /**
@@ -116,7 +124,7 @@ class MessageHelper
                 $template = $this->getTemplatePrefix($message) . $message->getEvent() . "." . $part . "." . $format . '.twig';
 
                 if(!$this->container->get('templating')->exists($template)){
-                    $this->container->get('logger')->warning(sprintf('Template %s does not exist', $template));
+                    $this->logger->debug(sprintf('Template %s does not exist', $template));
                 }
                 else {
                     $this->container->get('logger')->debug(sprintf('Rendering template %s with %', $template, $data));
