@@ -36,11 +36,6 @@ class MessageManager
     protected $serializer;
 
     /**
-     * @var MessageHelper
-     */
-    protected $messageHelper;
-
-    /**
      * @var LoggerInterface
      */
     private $logger;
@@ -49,15 +44,13 @@ class MessageManager
      * @param Producer $websocketProducer
      * @param ObjectManager $objectManager
      * @param Serializer $serializer
-     * @param MessageHelper $messageHelper
      * @param LoggerInterface $logger
      */
-    public function __construct(Producer $websocketProducer, ObjectManager $objectManager, Serializer $serializer, MessageHelper $messageHelper, LoggerInterface $logger)
+    public function __construct(Producer $websocketProducer, ObjectManager $objectManager, Serializer $serializer, LoggerInterface $logger)
     {
         $this->websocketProducer = $websocketProducer;
         $this->objectManager = $objectManager;
         $this->serializer = $serializer;
-        $this->messageHelper = $messageHelper;
         $this->logger = $logger;
     }
 

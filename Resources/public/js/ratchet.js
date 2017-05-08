@@ -98,6 +98,13 @@
     };
 
     /**
+     * Expose a socket close
+     */
+    Ratchet.prototype.closeSocket = function(){
+        return socket.close();
+    };
+
+    /**
      * Emits an event to the underlying websocket. Returns true on success, false on error.
      *
      * @param {string} event
