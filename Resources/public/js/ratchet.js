@@ -124,7 +124,9 @@
     /**
      * Expose a socket close
      */
-    Ratchet.prototype.socket = socket;
+    Ratchet.prototype.getSocket = function() {
+        return socket;
+    }
 
     /**
      * Handles a websocket message event.
