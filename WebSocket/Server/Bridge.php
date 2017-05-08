@@ -35,6 +35,24 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
     }
 
     /**
+     * Handles the the given payload received by the given connection.
+     *
+     * @param ConnectionInterface $connection
+     * @param Payload $payload
+     */
+    protected function handle(ConnectionInterface $connection, Payload $payload)
+    {
+        switch ($payload->getEvent()) {
+            case ConnectionEvent::SOCKET_AUTH_REQUEST:
+                $this->handleAuthentication($connection, $payload);
+                break;
+            default:
+                $this->eventDispatcher->dispatch($payload->getEvent(), new ConnectionEvent($connection, $payload));
+                $this->logger->notice(sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
+        }
+    }
+
+    /**
      * Handles the connection authentication.
      *
      * @param ConnectionInterface $connection
