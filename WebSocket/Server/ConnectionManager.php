@@ -64,7 +64,7 @@ class ConnectionManager extends BaseConnectionManager
     public function hasClient(UserInterface $user)
     {
         foreach ($this->connections as $id => $connection) {
-            if ($connection->getClient() == $user) {
+            if ($connection->getClient() === $user) {
                 return true;
             }
         }
