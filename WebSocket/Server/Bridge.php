@@ -1,6 +1,7 @@
 <?php
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Mopa\Bundle\FeedBundle\WebSocket\ConnectionEvents;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManagerInterface;
@@ -17,8 +18,14 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
 {
     /**
+     * @var Registry
+     */
+    protected $doctrine;
+
+    /**
      * @param ConnectionManagerInterface $connectionManager
      * @param EventDispatcherInterface $eventDispatcher
+     *
      * @param LoggerInterface $logger
      */
     public function __construct(
@@ -35,6 +42,29 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
     }
 
     /**
+     * @param Registry $doctrine
+     */
+    public function setRegistry($doctrine)
+    {
+        $this->doctrine = $doctrine;
+    }
+
+
+    private function establishConnection()
+    {
+        /**
+         * If any timeouts in doctrine occur
+         * @var \Doctrine\DBAL\Connection $connection
+         */
+        foreach($this->doctrine->getConnections() as $connection) {
+            if ($connection->ping() === false) {
+                $connection->close();
+                $connection->connect();
+            }
+        }
+    }
+
+    /**
      * Handles the the given payload received by the given connection.
      *
      * @param ConnectionInterface $connection
@@ -42,6 +72,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     protected function handle(ConnectionInterface $connection, Payload $payload)
     {
+        $this->establishConnection();
         switch ($payload->getEvent()) {
             case ConnectionEvent::SOCKET_AUTH_REQUEST:
                 $this->handleAuthentication($connection, $payload);
@@ -70,6 +101,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     public function onClose(SocketConnection $conn)
     {
+        $this->establishConnection();
         if($this->connectionManager->hasConnection($conn)) {
             $connection = $this->connectionManager->closeConnection($conn);
 
