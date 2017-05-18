@@ -31,6 +31,7 @@ class P2CompilerPass implements CompilerPassInterface
     {
         $container->setParameter('p2_ratchet.websocket.server_bridge.class', Bridge::class);
         $container->getDefinition('p2_ratchet.websocket.server_bridge')
+            ->replaceArgument('2', new Reference('logger'))
             ->setClass(Bridge::class)
             ->addMethodCall('setRegistry', [new Reference('doctrine')]);
 
