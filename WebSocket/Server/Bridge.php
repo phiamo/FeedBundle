@@ -109,24 +109,18 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
 
         if($connection) {
             $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_CLOSE, new ConnectionEvent($connection));
-        }
-        else{
-            $this->logger->warning(
+
+            $this->logger->notice(
                 sprintf(
-                    'Could not get connection for closing: <info>#%s</info> (<comment>%s</comment>)',
-                    $conn->getId(),
-                    $conn->getRemoteAddress()
+                    'Closed connection <info>#%s</info> (<comment>%s</comment>)',
+                    $connection->getId(),
+                    $connection->getRemoteAddress()
                 )
             );
         }
-
-        $this->logger->notice(
-            sprintf(
-                'Closed connection <info>#%s</info> (<comment>%s</comment>)',
-                $connection->getId(),
-                $connection->getRemoteAddress()
-            )
-        );
+        else{
+            $this->logger->log('warning', 'Could not get connection for closing', json_decode(json_encode($conn), true));
+        }
 
     }
 }
