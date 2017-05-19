@@ -49,7 +49,9 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         $this->doctrine = $doctrine;
     }
 
-
+    /**
+     * Establish connection
+     */
     private function establishConnection()
     {
         /**
@@ -102,18 +104,29 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
     public function onClose(SocketConnection $conn)
     {
         $this->establishConnection();
-        if($this->connectionManager->hasConnection($conn)) {
-            $connection = $this->connectionManager->closeConnection($conn);
 
+        $connection = $this->connectionManager->closeConnection($conn);
+
+        if($connection) {
             $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_CLOSE, new ConnectionEvent($connection));
-            $this->logger->notice(
+        }
+        else{
+            $this->logger->warning(
                 sprintf(
-                    'Closed connection <info>#%s</info> (<comment>%s</comment>)',
-                    $connection->getId(),
-                    $connection->getRemoteAddress()
+                    'Could not get connection for closing: <info>#%s</info> (<comment>%s</comment>)',
+                    $conn->getId(),
+                    $conn->getRemoteAddress()
                 )
             );
         }
+
+        $this->logger->notice(
+            sprintf(
+                'Closed connection <info>#%s</info> (<comment>%s</comment>)',
+                $connection->getId(),
+                $connection->getRemoteAddress()
+            )
+        );
 
     }
 }
