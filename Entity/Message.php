@@ -9,7 +9,6 @@ namespace Mopa\Bundle\FeedBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Mopa\Bundle\FeedBundle\Model\Message as BaseMessage;
-use JMS\Serializer\Annotation as Serializer;
 
 /**
  * Class Message

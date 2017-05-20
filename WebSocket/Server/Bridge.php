@@ -103,8 +103,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     public function onError(SocketConnection $conn, \Exception $e)
     {
-        $connection = $this->connectionManager->getConnection($conn);
-        $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_ERROR, new ConnectionEvent($connection));
+        $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_ERROR, new ErrorEvent($conn->resourceId));
 
         $this->connectionManager->closeConnection($conn);
         $this->logger->error($e->getMessage());

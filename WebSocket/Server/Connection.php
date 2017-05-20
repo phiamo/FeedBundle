@@ -1,6 +1,7 @@
 <?php
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
+use Mopa\Bundle\FeedBundle\Model\Message;
 use  P2\Bundle\RatchetBundle\WebSocket\Connection\Connection as BaseConnection;
 use P2\Bundle\RatchetBundle\WebSocket\Payload;
 
@@ -65,14 +66,32 @@ class Connection extends BaseConnection
     /**
      * Broadcasts an event to all
      *
+     * @param $topic
      * @param Payload $payload
-     * @return mixed
      */
-    public function broadcastToTopic($topic, Payload $payload)
+    public function broadcastPayloadToTopic($topic, Payload $payload)
     {
+        /** @var Connection $connection */
         foreach ($this->connectionManager->getConnections() as $connection) {
             if (in_array($topic, $connection->getBroadCastTopics())) {
                 $connection->emit($payload);
+            }
+        }
+    }
+
+    /**
+     * Broadcasts an event to all
+     *
+     * @param $topic
+     * @param Message $message
+     * @param callable $callback
+     */
+    public function broadcastToTopic($topic, Message $message, callable $callback)
+    {
+        /** @var Connection $connection */
+        foreach ($this->connectionManager->getConnections() as $connection) {
+            if (in_array($topic, $connection->getBroadCastTopics())) {
+                $callback($topic, $message);
             }
         }
     }

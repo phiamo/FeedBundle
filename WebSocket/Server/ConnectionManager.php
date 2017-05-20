@@ -72,6 +72,21 @@ class ConnectionManager extends BaseConnectionManager
     }
 
     /**
+     * @param $resourceId
+     * @return Connection|ConnectionInterface|false
+     */
+    public function getConnectionByResourceId($resourceId)
+    {
+        foreach ($this->connections as $id => $connection) {
+            if ($id === $resourceId) {
+                return $connection;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param $user_id
      * @return array<Connection>
      */
