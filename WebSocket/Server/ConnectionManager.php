@@ -27,6 +27,21 @@ class ConnectionManager extends BaseConnectionManager
     protected $registry;
 
     /**
+     * Method here to getOut Conneciton
+     */
+    public function addConnection(SocketConnection $socketConnection)
+    {
+        if (! $this->hasConnection($socketConnection)) {
+            $connection = new Connection($this, $socketConnection);
+            $this->connections[$connection->getId()] = $connection;
+
+            return $connection;
+        }
+
+        return false;
+    }
+
+    /**
      * @param $user_id
      * @return bool
      */

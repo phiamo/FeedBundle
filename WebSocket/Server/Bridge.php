@@ -81,7 +81,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 break;
             default:
                 $this->eventDispatcher->dispatch($payload->getEvent(), new ConnectionEvent($connection, $payload));
-                $this->logger->log('notice', sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
+                $this->logger->log('info', sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
         }
     }
 
@@ -99,13 +99,26 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
 
     /**
      * @param SocketConnection $conn
+     * @param \Exception $e
+     */
+    public function onError(SocketConnection $conn, \Exception $e)
+    {
+        $connection = $this->connectionManager->getConnection($conn);
+        $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_ERROR, new ConnectionEvent($connection));
+
+        $this->connectionManager->closeConnection($conn);
+        $this->logger->error($e->getMessage());
+    }
+
+    /**
+     * @param SocketConnection $conn
      * @throws \RuntimeException
      */
     public function onClose(SocketConnection $conn)
     {
         $this->establishConnection();
 
-        $connection = $this->connectionManager->closeConnection($conn);
+        $connection = $this->connectionManager->getConnection($conn);
 
         if($connection) {
             $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_CLOSE, new ConnectionEvent($connection));
@@ -122,5 +135,6 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
             $this->logger->log('warning', 'Could not get connection for closing', json_decode(json_encode($conn), true));
         }
 
+        $this->connectionManager->closeConnection($conn);
     }
 }
