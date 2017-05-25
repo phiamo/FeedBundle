@@ -86,12 +86,12 @@ class Connection extends BaseConnection
      * @param Message $message
      * @param callable $callback
      */
-    public function broadcastToTopic($topic, Message $message, callable $callback)
+    public function broadcastToTopic($topic, Message $message, $callback)
     {
         /** @var Connection $connection */
         foreach ($this->connectionManager->getConnections() as $connection) {
             if (in_array($topic, $connection->getBroadCastTopics())) {
-                $callback($topic, $message);
+                $callback($connection, $topic, $message);
             }
         }
     }
