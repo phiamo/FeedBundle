@@ -49,11 +49,18 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         $this->doctrine = $doctrine;
     }
 
+    static $lastPing = 0;
+    static $pinging = false;
     /**
      * Establish connection
      */
     private function establishConnection()
     {
+        if(self::$pinging || self::$lastPing + 10 > time() ) {
+            return;
+        }
+
+        self::$pinging = true;
         /**
          * If any timeouts in doctrine occur
          * @var \Doctrine\DBAL\Connection $connection
@@ -64,6 +71,8 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 $connection->connect();
             }
         }
+        self::$lastPing = time();
+        self::$pinging = false;
     }
 
     /**
