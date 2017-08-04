@@ -29,3 +29,6 @@ services:
             - "@mopa_feed.encryption_helper"
         tags:
             - { name: twig.extension }
+
+    mopa_feed.websocket.react_helper:
+        class: Mopa\Bundle\FeedBundle\WebSocket\Server\ReactHelper

@@ -98,9 +98,12 @@ class WebsocketServerCommand extends ContainerAwareCommand
             $rvhost = $this->getContainer()->getParameter('rabbitmq_vhost');
             $ruser = $this->getContainer()->getParameter('rabbitmq_user');
             $rpass = $this->getContainer()->getParameter('rabbitmq_pass');
-            $loop = $server->loop;
+
+            $reactLoop = $server->loop;
+
+            $this->getContainer()->get('mopa_feed.websocket.react_helper')->setLoop($reactLoop);
             // hooking stomp to the loop
-            $stompFactory = new ReactStompFactory($loop);
+            $stompFactory = new ReactStompFactory($reactLoop);
             // adding stomp login
             /** @var Client $client */
             $stompClient = $stompFactory->createClient(array(
