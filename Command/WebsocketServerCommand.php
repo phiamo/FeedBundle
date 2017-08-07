@@ -239,6 +239,9 @@ class WebsocketServerCommand extends ContainerAwareCommand
                             $output->writeln(sprintf("Trace: \n%s", $e->getTraceAsString()));
                         }
                     }
+                }, function(\Exception $e) use ($output){
+                    $output->writeln('<error>'.$e->getMessage().'</error>');
+                    exit;
                 });
 
             $server->run();
