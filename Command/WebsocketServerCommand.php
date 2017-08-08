@@ -10,6 +10,7 @@ use React\Stomp\AckResolver;
 use React\Stomp\Client;
 use React\Stomp\Protocol\Frame;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -86,6 +87,17 @@ class WebsocketServerCommand extends ContainerAwareCommand
             }
 
             $server = $factory->create();
+
+            $command = $this->getApplication()->find('rabbitmq:setup-fabric');
+
+            $arguments = array();
+
+            $greetInput = new ArrayInput($arguments);
+            $returnCode = $command->run($greetInput, $output);
+
+            if($returnCode !== 0) {
+                $output->writeln('<error>Could not setup rabbitmq</error>');
+            }
 
             $output->writeln(
                 sprintf(
