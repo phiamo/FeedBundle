@@ -71,6 +71,13 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 $connection->connect();
             }
         }
+
+
+        foreach($this->doctrine->getManagers() as $name => $manager) {
+            if (method_exists($manager, 'isOpen') && !$manager->isOpen()) {
+                $this->doctrine->resetManager($name);
+            }
+        }
         self::$lastPing = time();
         self::$pinging = false;
     }
