@@ -128,16 +128,15 @@ abstract class Message
      * @param null $save
      * @param null $decorate
      * @param array|SerializableMessageableInterface $data
-     * @throws \Exception
      */
     public function __construct($event, UserInterface $user = null, UserInterface $emittingUser = null, $save = null, $decorate = null, $data = array())
     {
         if(!is_array($data) && !($data instanceof SerializableMessageableInterface)) {
-            throw new \Exception('Message data must be array or SerializableMessageableInterface');
+            throw trigger_error('Message data must be array or SerializableMessageableInterface');
         }
 
         if(!$this->class) {
-            throw new \Exception('Message class must be set. Override property with e.g. `protected $class = self::class;`');
+            throw trigger_error('Message class must be set. Override property with e.g. `protected $class = self::class;`');
         }
 
         $this->created = new \DateTime();
