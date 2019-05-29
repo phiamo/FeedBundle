@@ -34,6 +34,9 @@ class MopaFeedExtension extends Extension
         if(!empty($config['key_dir'])) {
             $container->setParameter('mopa_feed.key_dir', $config['key_dir']);
         }
+        if(!empty($config['login_manager'])) {
+            $container->setParameter('mopa_feed.login_manager', $config['login_manager']);
+        }
 
         $container->setParameter('mopa_feed.message.template_prefix', $config['message_template_prefix']);
         $container->setParameter('mopa_feed.message.class', $config['message_class']);

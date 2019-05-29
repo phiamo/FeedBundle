@@ -7,7 +7,7 @@
 
 namespace Mopa\Bundle\FeedBundle\Model;
 
-use FOS\UserBundle\Model\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class FeedItem
