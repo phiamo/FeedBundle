@@ -3,7 +3,6 @@
 namespace Mopa\Bundle\FeedBundle\Command;
 
 use Doctrine\DBAL\DBALException;
-use FOS\UserBundle\Model\UserInterface;
 use Mopa\Bundle\FeedBundle\Model\Message;
 use Mopa\Bundle\FeedBundle\WebSocket\Server\Connection;
 use React\EventLoop\Timer\Timer;
@@ -284,7 +283,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
     {
         if($message->getFirewallName()) {
             try {
-                $this->getContainer()->get('fos_user.security.login_manager')->loginUser($message->getFirewallName(), $connection->getClient());
+                $this->getContainer()->get($this->getContainer()->getParameter('mopa_feed.login_manager'))->loginUser($message->getFirewallName(), $connection->getClient());
             } catch (\Exception $e) {
                 $output->writeln('<warning>' . $connection->getClient()->getUsername() . ' had unexpected login probs: ' . $e->getMessage() . '</warning>');
                 return false;

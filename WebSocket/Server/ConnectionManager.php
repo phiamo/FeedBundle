@@ -8,7 +8,7 @@ use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnec
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Exception\NotManagedConnectionException;
 use Ratchet\ConnectionInterface as SocketConnection;
-use FOS\UserBundle\Model\UserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class ConnectionManager
