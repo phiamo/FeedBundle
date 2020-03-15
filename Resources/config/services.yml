@@ -30,5 +30,5 @@ services:
         tags:
             - { name: twig.extension }
 
-    mopa_feed.websocket.react_helper:
+    Mopa\Bundle\FeedBundle\WebSocket\Server\ReactHelper:
         class: Mopa\Bundle\FeedBundle\WebSocket\Server\ReactHelper

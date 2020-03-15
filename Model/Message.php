@@ -334,7 +334,7 @@ abstract class Message
     /**
      * @param array $broadcastTopics
      */
-    public function setBroadcastTopic(array $broadcastTopics)
+    public function setBroadcastTopics(array $broadcastTopics)
     {
         $this->broadcastTopics = $broadcastTopics;
     }

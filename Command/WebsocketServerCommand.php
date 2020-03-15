@@ -115,7 +115,8 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $output->writeln('Using '.get_class($reactLoop).' reaktLoop implementation');
 
-            $this->getContainer()->get('mopa_feed.websocket.react_helper')->setLoop($reactLoop);
+            $this->getContainer()->get('Mopa\Bundle\FeedBundle\WebSocket\Server\ReactHelper')->setLoop($reactLoop);
+
             // hooking stomp to the loop
             $stompFactory = new ReactStompFactory($reactLoop);
             // adding stomp login
