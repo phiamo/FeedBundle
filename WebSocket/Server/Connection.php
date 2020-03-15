@@ -29,6 +29,11 @@ class Connection extends BaseConnection
     protected $broadcastTopics = [];
 
     /**
+     * @var array
+     */
+    protected $meta = [];
+
+    /**
      * @return string
      */
     public function getDataType()
@@ -57,7 +62,7 @@ class Connection extends BaseConnection
     /**
      * @param array $broadcastTopics
      */
-    public function setBroadcastTopics($broadcastTopics)
+    public function setBroadcastTopics(array $broadcastTopics)
     {
         $this->broadcastTopics = $broadcastTopics;
     }
@@ -93,5 +98,34 @@ class Connection extends BaseConnection
                 $callback($connection, $topic, $payload);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getMeta(): array
+    {
+        return $this->meta;
+    }
+
+    /**
+     * @param array $meta
+     */
+    public function setMeta(array $meta): void
+    {
+        $this->meta = $meta;
+    }
+
+    public function getMetaData(string $key, bool $default = null)
+    {
+        if(array_key_exists($key, $this->meta)) {
+            return $this->meta[$key];
+        }
+
+        return $default;
+    }
+    public function setMetaData($key, $value)
+    {
+        $this->meta[$key] = $value;
     }
 }

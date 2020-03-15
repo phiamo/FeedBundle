@@ -71,6 +71,7 @@ class MessageHelper
      */
     public function decorate(Message $message, array $formats = [])
     {
+        $this->logger->notice("decorate");
         if (null !== $message->getFeedItem()) {
             $message->setData($message->getFeedItem()->getMessageData());
         }
@@ -97,7 +98,6 @@ class MessageHelper
      * @param array $formats
      * @param array $parts
      * @return Message
-     * @throws \Exception
      */
     protected function render(Message $message, array $formats = [], array $parts = ["title", "body"])
     {

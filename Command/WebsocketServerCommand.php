@@ -131,10 +131,11 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $connectionManager = $this->getContainer()->get('p2_ratchet.websocket.connection_manager');
             $serializer = $this->getContainer()->get('jms_serializer');
+            $eventDispatcher = $this->getContainer()->get('event_dispatcher');
 
             $stompClient
                 ->connect()
-                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $reactLoop)
+                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $eventDispatcher)
                 {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
@@ -147,7 +148,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
                         $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver)
-                        use ($output, $serializer, $connectionManager, $reactLoop)
+                        use ($output, $serializer, $connectionManager, $eventDispatcher)
                         {
                             try {
                                 $tmp = json_decode($frame->body, true);
@@ -175,66 +176,70 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                     return;
                                 }
 
-                                $user = $message->getUser();
-
-                                if ($message->isBroadcast()) {
-                                    if($message->getEmittingUser()) {
-                                        $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . ":</info>" . $message->getEvent());
+                                if ($message->getEvent() === 'dwbn_chat.auth_success') {
+                                    $data = $message->getData();
+                                    $connection = $connectionManager->getConnectionByResourceId($data['connectionId']);
+                                    if($connection) {
+                                        $response = new Payload(ConnectionEvent::SOCKET_AUTH_SUCCESS, []);
+                                        $connection->emit($response);
+                                        $connection->setMetaData('muted', false);
+                                        $connection->setMetaData('token', $data['token']);
+                                        $connection->setBroadcastTopics($data['topics']);
+                                        $eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_SUCCESS, new ConnectionEvent($connection));
                                     }
-                                    else {
-                                        $output->writeln("<info>Broadcasting from message without emiting user: </info>" . $message->getEvent());
-                                    }
-
-                                    /** @var Connection $connection */
-                                    foreach ($connectionManager->getConnections() as $connection) {
-
-                                        if (!$connection->getClient()) {
-                                            $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
-                                            continue;
-                                        }
-                                        if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
-                                            $output->writeln("<info>Broadcasting to: " . $connection->getClient()->getUsername() . "</info>");
+                                    return;
+                                }
+                                else {
+                                    if ($message->isBroadcast()) {
+                                        if ($message->getEmittingUser()) {
+                                            $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . ":</info>" . $message->getEvent());
+                                        } else {
+                                            $output->writeln("<info>Broadcasting from message without emiting user: </info>" . $message->getEvent());
                                         }
 
-                                        $message->setUser($connection->getClient());
+                                        /** @var Connection $connection */
+                                        foreach ($connectionManager->getConnections() as $connection) {
 
-                                        if (count($message->getBroadcastTopics()) > 0) {
-                                            $send = false;
-                                            foreach ($message->getBroadcastTopics() as $topic) {
-                                                if (in_array($topic, $connection->getBroadcastTopics())) {
-                                                    $send = true;
-                                                }
-                                            }
-                                            if (!$send) {
+                                            if (!$connection->getMetaData('token')) {
+                                                $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
                                                 continue;
                                             }
-                                        }
-
-                                        $this->send($message, $connection, $output);
-                                    }
-                                } elseif ($user && $connectionManager->hasClientId($user->getId())) {
-                                    if ($output->getVerbosity() > OutputInterface::OUTPUT_RAW) {
-                                        $output->writeln("Having Client Id for User: <info>" . $user->getUsername() . "</info>");
-                                    }
-
-                                    $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
-
-                                    /** @var Connection $connection */
-                                    foreach ($connections as $connection) {
-                                        if ($connection) {
-                                            $this->send($message, $connection, $output);
-                                        } else {
-                                            if ($output->getVerbosity() > 2) {
-                                                $output->writeln("Discarding Msg for User: <info>" . $connection->getClient()->getUsername() . "</info> .. no connection");
+                                            if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                                $output->writeln("<info>Broadcasting to: " . $connection->getMetaData('token') . "</info>");
                                             }
+
+                                            //$message->setUser($connection->getClient());
+
+                                            if (count($message->getBroadcastTopics()) > 0) {
+                                                $send = false;
+                                                foreach ($message->getBroadcastTopics() as $topic) {
+                                                    if (in_array($topic, $connection->getBroadcastTopics())) {
+                                                        $send = true;
+                                                    }
+                                                }
+                                                if (!$send) {
+                                                    continue;
+                                                }
+                                            }
+
+                                            $this->send($message, $connection, $output);
                                         }
-                                    }
-                                } else {
-                                    if ($output->getVerbosity() > 1) {
-                                        if (!$user) {
-                                            $output->writeln("Couldnt get User for: <info>" . $frame->body . "</info>");
-                                        } else {
-                                            $output->writeln("No Connection for User: <info>" . $user->getId() . "</info>");
+                                    } else {
+                                        if(!$message->getUser()) {
+                                            var_dump($message);exit;
+                                        }
+                                        $token = $message->getUser()->getAccessToken();
+                                        $connections = $connectionManager->getConnectionsByToken($token);
+
+                                        /** @var Connection $connection */
+                                        foreach ($connections as $connection) {
+                                            if ($connection) {
+                                                $this->send($message, $connection, $output);
+                                            } else {
+                                                if ($output->getVerbosity() > 2) {
+                                                    $output->writeln("Discarding Msg for User: <info>" . $connection->getMetaData('token') . "</info> .. no connection");
+                                                }
+                                            }
                                         }
                                     }
                                 }
@@ -276,6 +281,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
      */
     protected function send(Message $message, Connection $connection, OutputInterface $output)
     {
+
         /*
         if($message->getFirewallName()) {
             try {
@@ -299,8 +305,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
         if (OutputInterface::VERBOSITY_NORMAL <= $output->getVerbosity()) {
             $output->writeln(
-                '<info><comment>Stomp</comment> dispatching '.$message->getEvent().'</info>
-                    for conn #'.$connection->getId().' Type: ' .$connection->getDataType(). ''
+                '<info><comment>Stomp</comment> dispatching '.$message->getEvent().'</info> for conn #'.$connection->getId().' Type: ' .$connection->getDataType(). ''
             );
         }
 
@@ -313,6 +318,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
         $this->getContainer()->get('event_dispatcher')->dispatch('mopa_feed.websocket.message',
             new ConnectionEvent($connection, $payload)
         );
+
 
         return true;
     }
