@@ -134,7 +134,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $stompClient
                 ->connect()
-                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $reactLoop)
+                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager)
                 {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
@@ -147,7 +147,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
                         $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver)
-                        use ($output, $serializer, $connectionManager, $reactLoop)
+                        use ($output, $serializer, $connectionManager)
                         {
                             try {
                                 $tmp = json_decode($frame->body, true);
