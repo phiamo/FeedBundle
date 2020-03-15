@@ -135,7 +135,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $stompClient
                 ->connect()
-                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $eventDispatcher)
+                ->then(function (Client $stompClient) use ($output, $serializer, $connectionManager, $eventDispatcher, $reactLoop)
                 {
                     try { // do not exit the loop due to ANY failure in here ... ;(
                         $output->writeln(sprintf(
@@ -148,7 +148,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                          * and emits it as ConnectionEvent to the all connections the user has via the Websocket Application
                          */
                         $stompClient->subscribeWithAck('/queue/websockets', 'client-individual', function (Frame $frame, AckResolver $ackResolver)
-                        use ($output, $serializer, $connectionManager, $eventDispatcher)
+                        use ($output, $serializer, $connectionManager, $eventDispatcher, $reactLoop)
                         {
                             try {
                                 $tmp = json_decode($frame->body, true);
@@ -202,49 +202,46 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
                                         /** @var Connection $connection */
                                         foreach ($connectionManager->getConnections() as $connection) {
-
-                                            if (!$connection->getMetaData('token')) {
-                                                if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
-                                                    $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
+                                            $reactLoop->addTimer(0.01, function () use($connection, $output, $message) {
+                                                if (!$connection->getMetaData('token')) {
+                                                    if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
+                                                        $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
+                                                    }
+                                                    return;
                                                 }
-                                                continue;
-                                            }
-                                            if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
-                                                $output->writeln("<info>Broadcasting to: " . $connection->getMetaData('token') . "</info>");
-                                            }
-
-                                            //$message->setUser($connection->getClient());
-
-                                            if (count($message->getBroadcastTopics()) > 0) {
-                                                $send = false;
-                                                foreach ($message->getBroadcastTopics() as $topic) {
-                                                    if (in_array($topic, $connection->getBroadcastTopics())) {
-                                                        $send = true;
+                                                if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
+                                                    $output->writeln("<info>Broadcasting to: " . $connection->getMetaData('token') . "</info>");
+                                                }
+                                                if (count($message->getBroadcastTopics()) > 0) {
+                                                    $send = false;
+                                                    foreach ($message->getBroadcastTopics() as $topic) {
+                                                        if (in_array($topic, $connection->getBroadcastTopics())) {
+                                                            $send = true;
+                                                        }
+                                                    }
+                                                    if (!$send) {
+                                                        return;
                                                     }
                                                 }
-                                                if (!$send) {
-                                                    continue;
-                                                }
-                                            }
 
-                                            $this->send($message, $connection, $output);
+                                                $this->send($message, $connection, $output);
+                                            });
                                         }
                                     } else {
-                                        if(!$message->getUser()) {
-                                            var_dump($message);exit;
-                                        }
                                         $token = $message->getUser()->getAccessToken();
                                         $connections = $connectionManager->getConnectionsByToken($token);
 
                                         /** @var Connection $connection */
                                         foreach ($connections as $connection) {
-                                            if ($connection) {
-                                                $this->send($message, $connection, $output);
-                                            } else {
-                                                if ($output->getVerbosity() > 2) {
-                                                    $output->writeln("Discarding Msg for User: <info>" . $connection->getMetaData('token') . "</info> .. no connection");
+                                            $reactLoop->addTimer(0.01, function () use($connection, $output, $message) {
+                                                if ($connection) {
+                                                    $this->send($message, $connection, $output);
+                                                } else {
+                                                    if ($output->getVerbosity() > 2) {
+                                                        $output->writeln("Discarding Msg for User: <info>" . $connection->getMetaData('token') . "</info> .. no connection");
+                                                    }
                                                 }
-                                            }
+                                            });
                                         }
                                     }
                                 }
