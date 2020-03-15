@@ -18,6 +18,7 @@ use React\Stomp\Factory as ReactStompFactory;
 use P2\Bundle\RatchetBundle\WebSocket\ConnectionEvent;
 use P2\Bundle\RatchetBundle\WebSocket\Payload;
 use JMS\Serializer\SerializationContext;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class WebsocketServerCommand
@@ -174,69 +175,60 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                     return;
                                 }
 
-                                /** @var UserInterface $user */
                                 $user = $message->getUser();
 
                                 if ($message->isBroadcast()) {
                                     if($message->getEmittingUser()) {
-                                        $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . "</info>");
+                                        $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . ":</info>" . $message->getEvent());
                                     }
                                     else {
-                                        $output->writeln("<info>Broadcasting from message without emiting user</info>");
+                                        $output->writeln("<info>Broadcasting from message without emiting user: </info>" . $message->getEvent());
                                     }
 
-                                    $reactLoop->addPeriodicTimer(0.01, function(Timer $timer) use ($connectionManager, $output, $message) {
+                                    /** @var Connection $connection */
+                                    foreach ($connectionManager->getConnections() as $connection) {
 
-                                        $timer->cancel();
-                                        /** @var Connection $connection */
-                                        foreach ($connectionManager->getConnections() as $connection) {
+                                        if (!$connection->getClient()) {
+                                            $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
+                                            continue;
+                                        }
+                                        if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                            $output->writeln("<info>Broadcasting to: " . $connection->getClient()->getUsername() . "</info>");
+                                        }
 
-                                            if (!$connection->getClient()) {
-                                                $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
+                                        $message->setUser($connection->getClient());
+
+                                        if (count($message->getBroadcastTopics()) > 0) {
+                                            $send = false;
+                                            foreach ($message->getBroadcastTopics() as $topic) {
+                                                if (in_array($topic, $connection->getBroadcastTopics())) {
+                                                    $send = true;
+                                                }
+                                            }
+                                            if (!$send) {
                                                 continue;
                                             }
-                                            if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
-                                                $output->writeln("<info>Broadcasting to: " . $connection->getClient()->getUsername() . "</info>");
-                                            }
-
-                                            $message->setUser($connection->getClient());
-
-                                            if (count($message->getBroadcastTopics()) > 0) {
-                                                $send = false;
-                                                foreach ($message->getBroadcastTopics() as $topic) {
-                                                    if (in_array($topic, $connection->getBroadcastTopics())) {
-                                                        $send = true;
-                                                    }
-                                                }
-                                                if (!$send) {
-                                                    continue;
-                                                }
-                                            }
-
-                                            $this->send($message, $connection, $output);
                                         }
-                                    });
+
+                                        $this->send($message, $connection, $output);
+                                    }
                                 } elseif ($user && $connectionManager->hasClientId($user->getId())) {
-                                    if ($output->getVerbosity() > 2) {
+                                    if ($output->getVerbosity() > OutputInterface::OUTPUT_RAW) {
                                         $output->writeln("Having Client Id for User: <info>" . $user->getUsername() . "</info>");
                                     }
 
                                     $connections = $connectionManager->getConnectionsByClientId($message->getUser()->getId());
 
-                                    $reactLoop->addPeriodicTimer(0.01, function(Timer $timer) use ($connections, $message, $output) {
-
-                                        $timer->cancel();
-                                        /** @var Connection $connection */
-                                        foreach ($connections as $connection) {
-                                            if ($connection) {
-                                                $this->send($message, $connection, $output);
-                                            } else {
-                                                if ($output->getVerbosity() > 2) {
-                                                    $output->writeln("Discarding Msg for User: <info>" . $connection->getClient()->getUsername() . "</info> .. no connection");
-                                                }
+                                    /** @var Connection $connection */
+                                    foreach ($connections as $connection) {
+                                        if ($connection) {
+                                            $this->send($message, $connection, $output);
+                                        } else {
+                                            if ($output->getVerbosity() > 2) {
+                                                $output->writeln("Discarding Msg for User: <info>" . $connection->getClient()->getUsername() . "</info> .. no connection");
                                             }
                                         }
-                                    });
+                                    }
                                 } else {
                                     if ($output->getVerbosity() > 1) {
                                         if (!$user) {
@@ -284,6 +276,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
      */
     protected function send(Message $message, Connection $connection, OutputInterface $output)
     {
+        /*
         if($message->getFirewallName()) {
             try {
                 $this->getContainer()->get($this->getContainer()->getParameter('mopa_feed.login_manager'))->loginUser($message->getFirewallName(), $connection->getClient());
@@ -291,9 +284,9 @@ class WebsocketServerCommand extends ContainerAwareCommand
                 $output->writeln('<warning>' . $connection->getClient()->getUsername() . ' had unexpected login probs: ' . $e->getMessage() . '</warning>');
                 return false;
             }
-        }
+        }*/
 
-        $message = $this->getContainer()->get('mopa_feed.message_helper')->decorate($message, array($connection->getDataType()));
+        //$message = $this->getContainer()->get('mopa_feed.message_helper')->decorate($message, array($connection->getDataType()));
         // this is an "external endpoint" so we need to use a real serializer here
         // json_decode to reform for Payload->encode()
         $msg = json_decode(
