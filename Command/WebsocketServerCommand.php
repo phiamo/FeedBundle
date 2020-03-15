@@ -192,7 +192,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                 else {
                                     if ($message->isBroadcast()) {
 
-                                        if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                        if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL) {
                                             if ($message->getEmittingUser()) {
                                                 $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . ":</info>" . $message->getEvent());
                                             } else {
@@ -204,12 +204,12 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                         foreach ($connectionManager->getConnections() as $connection) {
 
                                             if (!$connection->getMetaData('token')) {
-                                                if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                                if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
                                                     $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
                                                 }
                                                 continue;
                                             }
-                                            if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                            if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
                                                 $output->writeln("<info>Broadcasting to: " . $connection->getMetaData('token') . "</info>");
                                             }
 
