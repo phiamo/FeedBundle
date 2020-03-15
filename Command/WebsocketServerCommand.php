@@ -191,17 +191,22 @@ class WebsocketServerCommand extends ContainerAwareCommand
                                 }
                                 else {
                                     if ($message->isBroadcast()) {
-                                        if ($message->getEmittingUser()) {
-                                            $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . ":</info>" . $message->getEvent());
-                                        } else {
-                                            $output->writeln("<info>Broadcasting from message without emiting user: </info>" . $message->getEvent());
+
+                                        if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                            if ($message->getEmittingUser()) {
+                                                $output->writeln("<info>Broadcasting from: " . $message->getEmittingUser()->getUsername() . ":</info>" . $message->getEvent());
+                                            } else {
+                                                $output->writeln("<info>Broadcasting from message without emiting user: </info>" . $message->getEvent());
+                                            }
                                         }
 
                                         /** @var Connection $connection */
                                         foreach ($connectionManager->getConnections() as $connection) {
 
                                             if (!$connection->getMetaData('token')) {
-                                                $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
+                                                if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
+                                                    $output->writeln("<warning>No client for: " . $connection->getId() . "</warning>");
+                                                }
                                                 continue;
                                             }
                                             if ($output->getVerbosity() > OutputInterface::OUTPUT_NORMAL) {
@@ -303,7 +308,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
         $payload = new Payload($message->getEvent(), $msg);
 
-        if (OutputInterface::VERBOSITY_NORMAL <= $output->getVerbosity()) {
+        if ($output->getVerbosity() > OutputInterface::VERBOSITY_NORMAL ) {
             $output->writeln(
                 '<info><comment>Stomp</comment> dispatching '.$message->getEvent().'</info> for conn #'.$connection->getId().' Type: ' .$connection->getDataType(). ''
             );
