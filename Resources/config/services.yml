@@ -12,12 +12,6 @@ services:
         tags:
             - { name: monolog.logger, channel: 'mopa_feed.message_helper'}
 
-    mopa_feed.websocket.application:
-        class: Mopa\Bundle\FeedBundle\WebSocket\Application
-        tags:
-            - { name: kernel.event_subscriber }
-            - { name: p2_ratchet.application }
-
     mopa_feed.encryption_helper:
         class: Mopa\Bundle\FeedBundle\WebSocket\Server\EncryptionHelper
         arguments:

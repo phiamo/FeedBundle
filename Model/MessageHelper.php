@@ -66,8 +66,8 @@ class MessageHelper
      * Decorate a Message depending on the formats given
      * Take decorator service if needed by message
      * @param Message $message
-     * @param array   $formats
-     * @return Message
+     * @param array $formats
+     * @throws \Twig\Error\Error
      */
     public function decorate(Message $message, array $formats = [])
     {
@@ -78,26 +78,24 @@ class MessageHelper
 
         if ($message->getDecorate()) {
             if($message->getDecoratorService() === 'templating'){
-                return $this->render($message, $formats);
+                $this->render($message, $formats);
             }
             elseif($this->container->has($message->getDecoratorService())) {
                 /** @var MessageDecoratorInterface $decorator */
                 $decorator = $this->container->get($message->getDecoratorService());
-                return $decorator->decorate($message, $formats);
+                $decorator->decorate($message, $formats);
             }
             else{
                 $this->container->get('logger')->warning(sprintf('Decorator Service "%s" does not exist', $message->getDecoratorService()));
             }
         }
-
-        return $message;
     }
 
     /**
      * @param Message $message
      * @param array $formats
      * @param array $parts
-     * @return Message
+     * @throws \Twig\Error\Error
      */
     protected function render(Message $message, array $formats = [], array $parts = ["title", "body"])
     {
@@ -129,8 +127,6 @@ class MessageHelper
         }
 
         $message->setData($data);
-
-        return $message;
     }
 
     /**

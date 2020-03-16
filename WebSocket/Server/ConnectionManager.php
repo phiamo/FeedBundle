@@ -57,36 +57,6 @@ class ConnectionManager extends BaseConnectionManager
     }
 
     /**
-     * @param $user_id
-     * @return bool
-     */
-    public function hasToken($token)
-    {
-        foreach ($this->connections as $id => $connection) {
-            if (null !== $token && $connection->getMetaData($token)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * @param $user_id
-     * @return bool
-     */
-    public function getByToken($token)
-    {
-        foreach ($this->connections as $id => $connection) {
-            if (null !== $token && $connection->getMetaData($token)) {
-                return $connection;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @param  UserInterface $user
      * @return bool
      */
@@ -126,22 +96,6 @@ class ConnectionManager extends BaseConnectionManager
         foreach ($this->connections as $id => $connection) {
             /** @var ConnectionInterface $connection */
             if ($connection->getClient() && $connection->getClient()->getId() == $user_id) {
-                $conns[] = $connection;
-            }
-        }
-
-        return $conns;
-    }
-    /**
-     * @param $token
-     * @return Connection[]
-     */
-    public function getConnectionsByToken($token)
-    {
-        $conns = array();
-        foreach ($this->connections as $id => $connection) {
-            /** @var ConnectionInterface $connection */
-            if ($connection->getMetaData('token') === $token) {
                 $conns[] = $connection;
             }
         }

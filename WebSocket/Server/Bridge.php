@@ -110,7 +110,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
     protected function handleAuthentication(ConnectionInterface $connection, Payload $payload)
     {
         parent::handleAuthentication($connection, $payload);
-        $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_REQUEST, new ConnectionEvent($connection));
+        $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_REQUEST, new ConnectionEvent($connection, $payload));
     }
 
     /**
@@ -119,6 +119,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     public function onError(SocketConnection $conn, \Exception $e)
     {
+        // give us a chance to cleanup and send this to our app
         $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_ERROR, new ErrorEvent($conn->resourceId));
 
         $this->connectionManager->closeConnection($conn);
@@ -131,8 +132,6 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     public function onClose(SocketConnection $conn)
     {
-        $this->establishConnection();
-
         $connection = $this->connectionManager->getConnection($conn);
 
         if($connection) {
