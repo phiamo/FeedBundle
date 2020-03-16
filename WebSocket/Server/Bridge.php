@@ -109,10 +109,36 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     protected function handleAuthentication(ConnectionInterface $connection, Payload $payload)
     {
-        parent::handleAuthentication($connection, $payload);
-        $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_REQUEST, new ConnectionEvent($connection, $payload));
-    }
+        if (! $this->connectionManager->authenticate($connection, $payload->getData())) {
+            $connection->emit(new Payload(ConnectionEvent::SOCKET_AUTH_FAILURE, 'Invalid access token.'));
 
+            $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_FAILURE, new ConnectionEvent($connection));
+
+            $this->logger->notice(
+                sprintf(
+                    'Authentication error <info>#%s</info> (<comment>%s</comment>)',
+                    $connection->getId(),
+                    $connection->getRemoteAddress()
+                )
+            );
+
+            $this->connectionManager->closeConnection($connection);
+            return;
+        }
+
+        $response = new Payload(ConnectionEvent::SOCKET_AUTH_SUCCESS, $connection->getClient()->jsonSerialize());
+        $connection->emit($response);
+
+        $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_SUCCESS, new ConnectionEvent($connection));
+
+        $this->logger->notice(
+            sprintf(
+                'Authenticated <info>#%s</info> (<comment>%s</comment>)',
+                $connection->getId(),
+                $connection->getRemoteAddress()
+            )
+        );
+    }
     /**
      * @param SocketConnection $conn
      * @param \Exception $e
