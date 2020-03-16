@@ -75,6 +75,16 @@ class ConnectionManager extends BaseConnectionManager
         }
     }
 
+    public function closeConnectionById(string $connectionId) {
+        if(array_key_exists($connectionId, $this->connections)) {
+            $connection = $this->connections[$connectionId];
+            $connection->close();
+
+            unset($this->connections[$connection->getId()]);
+
+            $this->unregisterClientConnection($connection);
+        }
+    }
     /**
      * {@inheritDoc}
      */

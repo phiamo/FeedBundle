@@ -122,7 +122,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 )
             );
 
-            $this->connectionManager->closeConnection($connection);
+            $this->connectionManager->closeConnectionById($connection->getId());
             return;
         }
 
@@ -139,6 +139,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
             )
         );
     }
+
     /**
      * @param SocketConnection $conn
      * @param \Exception $e
