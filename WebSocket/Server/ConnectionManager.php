@@ -4,11 +4,11 @@ namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Mopa\Bundle\FeedBundle\Model\AnonymousUser;
+use P2\Bundle\RatchetBundle\WebSocket\Client\ClientInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnectionManager;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Exception\NotManagedConnectionException;
 use Ratchet\ConnectionInterface as SocketConnection;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Class ConnectionManager
@@ -27,7 +27,12 @@ class ConnectionManager extends BaseConnectionManager
     protected $registry;
 
     /**
-     * Method here to getOut Conneciton
+     * @var Connection[][]
+     */
+    protected $clientIds = [];
+
+    /**
+     * Leave that method so we instanciate our own connection
      */
     public function addConnection(SocketConnection $socketConnection)
     {
@@ -41,34 +46,53 @@ class ConnectionManager extends BaseConnectionManager
         return false;
     }
 
-    /**
-     * @param $user_id
-     * @return bool
-     */
-    public function hasClientId($user_id)
+    private function registerClientConnection(ConnectionInterface $connection, ClientInterface $client)
     {
-        foreach ($this->connections as $id => $connection) {
-            if (null !== $user_id && $connection->getClient() && $connection->getClient()->getId() == $user_id) {
-                return true;
-            }
+        $connection->setClient($client);
+
+        $clientId = $client->getId();
+        if(!array_key_exists($clientId, $this->clientIds)) {
+            $this->clientIds[$clientId] = [];
         }
 
-        return false;
+        $this->clientIds[$clientId][] = $connection->getId();
+    }
+
+    private function unregisterClientConnection(ConnectionInterface $connection)
+    {
+        $client = $connection->getClient();
+        if($client) {
+            $connId = $connection->getId();
+            $clientId = $client->getId();
+            if(array_key_exists($clientId, $this->clientIds)) {
+                if (($key = array_search($connId, $this->clientIds[$clientId])) !== false) {
+                    unset($this->clientIds[$clientId][$key]);
+                }
+                if (count($this->clientIds[$clientId]) === 0) {
+                    unset($this->clientIds[$clientId]);
+                }
+            }
+        }
     }
 
     /**
-     * @param  UserInterface $user
-     * @return bool
+     * {@inheritDoc}
      */
-    public function hasClient(UserInterface $user)
+    public function closeConnection(SocketConnection $socketConnection)
     {
-        foreach ($this->connections as $id => $connection) {
-            if ($connection->getClient() === $user) {
-                return true;
-            }
+        if (! $this->hasConnection($socketConnection)) {
+
+            return false;
         }
 
-        return false;
+        $connection = $this->getConnection($socketConnection);
+        $connection->close();
+
+        unset($this->connections[$connection->getId()]);
+
+        $this->unregisterClientConnection($connection);
+
+        return $connection;
     }
 
     /**
@@ -77,26 +101,23 @@ class ConnectionManager extends BaseConnectionManager
      */
     public function getConnectionByResourceId($resourceId)
     {
-        foreach ($this->connections as $id => $connection) {
-            if ($id === $resourceId) {
-                return $connection;
-            }
+        if(array_key_exists($resourceId, $this->connections)) {
+            return $this->connections[$resourceId];
         }
 
         return false;
     }
 
     /**
-     * @param $user_id
-     * @return array<Connection>
+     * @param $clientId
+     * @return Connection[]
      */
-    public function getConnectionsByClientId($user_id)
+    public function getConnectionsByClientId($clientId)
     {
-        $conns = array();
-        foreach ($this->connections as $id => $connection) {
-            /** @var ConnectionInterface $connection */
-            if ($connection->getClient() && $connection->getClient()->getId() == $user_id) {
-                $conns[] = $connection;
+        $conns = [];
+        if(array_key_exists($clientId, $this->clientIds)) {
+            foreach ($this->clientIds[$clientId] as $connId) {
+                $conns[] = $this->connections[$connId];
             }
         }
 
@@ -115,12 +136,10 @@ class ConnectionManager extends BaseConnectionManager
          * If we have a registry and any timeouts in doctrine occur
          * @var \Doctrine\DBAL\Connection $dbalConnection
          */
-        if($this->registry) {
-            foreach ($this->registry->getConnections() as $dbalConnection) {
-                if (method_exists($dbalConnection, 'ping') && $dbalConnection->ping() === false) {
-                    $dbalConnection->close();
-                    $dbalConnection->connect();
-                }
+        foreach ($this->registry->getConnections() as $dbalConnection) {
+            if (method_exists($dbalConnection, 'ping') && $dbalConnection->ping() === false) {
+                $dbalConnection->close();
+                $dbalConnection->connect();
             }
         }
 
@@ -136,7 +155,6 @@ class ConnectionManager extends BaseConnectionManager
         }
 
         if (null !== $client = $this->clientProvider->findByAccessToken($accessToken)) {
-            $connection->setClient($client);
 
             $type = @$data["data_type"];
             $connection->setDataType($type);
@@ -145,6 +163,8 @@ class ConnectionManager extends BaseConnectionManager
                 $topics = (array)@$data["broadcastTopics"];
                 $connection->setBroadcastTopics($topics);
             }
+
+            $this->registerClientConnection($connection, $client);
 
             return true;
         }
@@ -156,7 +176,7 @@ class ConnectionManager extends BaseConnectionManager
             if($decryptedAccessToken) {
 
                 $client = new AnonymousUser($decryptedAccessToken);
-                $connection->setClient($client);
+                $this->registerClientConnection($connection, $client);
 
                 return true;
             }
