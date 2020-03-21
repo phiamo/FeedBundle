@@ -179,19 +179,6 @@ class ConnectionManager extends BaseConnectionManager
             return true;
         }
 
-        if($accessToken != '') {
-
-            $decryptedAccessToken = $this->encryptionHelper->decrypt($accessToken);
-
-            if($decryptedAccessToken) {
-
-                $client = new AnonymousUser($decryptedAccessToken);
-                $this->registerClientConnection($connection, $client);
-
-                return true;
-            }
-        }
-
         return false;
     }
 

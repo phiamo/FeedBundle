@@ -97,7 +97,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 break;
             default:
                 $this->eventDispatcher->dispatch($payload->getEvent(), new ConnectionEvent($connection, $payload));
-                $this->logger->log('info', sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
+                $this->logger->debug(sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
         }
     }
 
@@ -150,7 +150,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_ERROR, new ErrorEvent($conn->resourceId));
 
         $this->connectionManager->closeConnection($conn);
-        $this->logger->error($e->getMessage());
+        $this->logger->error($e->getMessage(), $e->getTrace());
     }
 
     /**
