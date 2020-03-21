@@ -106,7 +106,12 @@ class MessageManager
 
         $this->logger->debug('Sending data to mopa_feed_websockets', json_decode($serialized, true));
 
-        $this->websocketProducer->publish($serialized);
+        try {
+            $this->websocketProducer->publish($serialized);
+        }
+        catch (\Exception $e) {
+            $this->logger->warning('Sending data to mopa_feed_websockets failed: ' . $e->getMessage(), $e->getTrace());
+        }
 
         return $message;
     }
