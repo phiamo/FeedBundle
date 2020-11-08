@@ -3,7 +3,6 @@ namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Mopa\Bundle\FeedBundle\Model\AnonymousUser;
 use P2\Bundle\RatchetBundle\WebSocket\Client\ClientInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnectionManager;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
@@ -16,15 +15,8 @@ use Ratchet\ConnectionInterface as SocketConnection;
  */
 class ConnectionManager extends BaseConnectionManager
 {
-    /**
-     * @var EncryptionHelper
-     */
-    protected $encryptionHelper;
-
-    /**
-     * @var ManagerRegistry
-     */
-    protected $registry;
+    protected EncryptionHelper $encryptionHelper;
+    protected ManagerRegistry $registry;
 
     /**
      * @var Connection[][]

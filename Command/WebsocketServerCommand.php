@@ -3,20 +3,30 @@
 namespace Mopa\Bundle\FeedBundle\Command;
 
 use Mopa\Bundle\FeedBundle\WebSocket\Server\ServerStartEvent;
-use P2\Bundle\RatchetBundle\WebSocket\ConnectionEvent;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use P2\Bundle\RatchetBundle\WebSocket\Server\Factory;
+use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 
-/**
- * Class WebsocketServerCommand
- * @package Mopa\Bundle\FeedBundle\Command
- */
-class WebsocketServerCommand extends ContainerAwareCommand
+class WebsocketServerCommand extends  Command implements ContainerAwareInterface
 {
+    use ContainerAwareTrait;
+    protected static $defaultName = 'mopa:feed:websocketserver:start';
+    private Factory $factory;
+
+    public function __construct(
+        Factory $factory
+    )
+    {
+        parent::__construct(self::$defaultName);
+        $this->factory = $factory;
+    }
+
     /**
      * @var string
      */
@@ -38,7 +48,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
             ->addArgument(static::ARG_ADDRESS, InputArgument::OPTIONAL, 'The address to listen on')
             ->setDescription('Starts a enhanced web socket server')
             ->setHelp('mopa:feed:websocketserver:start [port] [address]')
-            ->setName('mopa:feed:websocketserver:start');
+        ;
     }
 
     /**
@@ -48,21 +58,18 @@ class WebsocketServerCommand extends ContainerAwareCommand
     {
         if ($output->getVerbosity() > 0) {
             $output->writeln('Verbosity: '.$output->getVerbosity());
-            $output->writeln('Env: '.$this->getContainer()->get('kernel')->getEnvironment());
+            $output->writeln('Env: '.$this->container->get('kernel')->getEnvironment());
         }
         try {
-            /** @var \P2\Bundle\RatchetBundle\WebSocket\Server\Factory $factory */
-            $factory = $this->getContainer()->get('p2_ratchet.websocket.server_factory');
-
             if (null !== $address = $input->getArgument(static::ARG_ADDRESS)) {
-                $factory->setAddress($address);
+                $this->factory->setAddress($address);
             }
 
             if (null !== $port = $input->getArgument(static::ARG_PORT)) {
-                $factory->setPort($port);
+                $this->factory->setPort($port);
             }
 
-            $server = $factory->create();
+            $server = $this->factory->create();
 
             $command = $this->getApplication()->find('rabbitmq:setup-fabric');
 
@@ -78,8 +85,8 @@ class WebsocketServerCommand extends ContainerAwareCommand
             $output->writeln(
                 sprintf(
                     '<info><comment>Ratchet</comment> - listening on %s:%s</info>',
-                    $factory->getAddress(),
-                    $factory->getPort()
+                    $this->factory->getAddress(),
+                    $this->factory->getPort()
                 )
             );
 
@@ -87,7 +94,7 @@ class WebsocketServerCommand extends ContainerAwareCommand
 
             $output->writeln('Using '.get_class($reactLoop).' reaktLoop implementation');
 
-            $this->getContainer()->get('event_dispatcher')->dispatch(self::SERVER_START, new ServerStartEvent($reactLoop));
+            $this->container->get('event_dispatcher')->dispatch(new ServerStartEvent($reactLoop), self::SERVER_START);
 
             $server->run();
 

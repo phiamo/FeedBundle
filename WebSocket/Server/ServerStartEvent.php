@@ -5,7 +5,7 @@ namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 
 use React\EventLoop\LoopInterface;
-use Symfony\Component\EventDispatcher\Event;
+use Symfony\Contracts\EventDispatcher\Event;
 
 class ServerStartEvent extends Event
 {

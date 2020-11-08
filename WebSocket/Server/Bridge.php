@@ -96,7 +96,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 $this->handleAuthentication($connection, $payload);
                 break;
             default:
-                $this->eventDispatcher->dispatch($payload->getEvent(), new ConnectionEvent($connection, $payload));
+                $this->eventDispatcher->dispatch(new ConnectionEvent($connection, $payload), $payload->getEvent());
                 $this->logger->debug(sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
         }
     }
@@ -112,7 +112,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         if (! $this->connectionManager->authenticate($connection, $payload->getData())) {
             $connection->emit(new Payload(ConnectionEvent::SOCKET_AUTH_FAILURE, 'Invalid access token.'));
 
-            $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_FAILURE, new ConnectionEvent($connection));
+            $this->eventDispatcher->dispatch(new ConnectionEvent($connection), ConnectionEvent::SOCKET_AUTH_FAILURE);
 
             $this->logger->notice(
                 sprintf(
@@ -129,7 +129,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         $response = new Payload(ConnectionEvent::SOCKET_AUTH_SUCCESS, $connection->getClient()->jsonSerialize());
         $connection->emit($response);
 
-        $this->eventDispatcher->dispatch(ConnectionEvent::SOCKET_AUTH_SUCCESS, new ConnectionEvent($connection));
+        $this->eventDispatcher->dispatch(new ConnectionEvent($connection), ConnectionEvent::SOCKET_AUTH_SUCCESS);
 
         $this->logger->notice(
             sprintf(
@@ -147,7 +147,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
     public function onError(SocketConnection $conn, \Exception $e)
     {
         // give us a chance to cleanup and send this to our app
-        $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_ERROR, new ErrorEvent($conn->resourceId));
+        $this->eventDispatcher->dispatch(new ErrorEvent($conn->resourceId), ConnectionEvents::WEBSOCKET_ERROR);
 
         $this->connectionManager->closeConnection($conn);
         $this->logger->error($e->getMessage(), $e->getTrace());
@@ -162,7 +162,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         $connection = $this->connectionManager->getConnection($conn);
 
         if($connection) {
-            $this->eventDispatcher->dispatch(ConnectionEvents::WEBSOCKET_CLOSE, new ConnectionEvent($connection));
+            $this->eventDispatcher->dispatch(new ConnectionEvent($connection), ConnectionEvents::WEBSOCKET_CLOSE);
 
             $this->logger->notice(
                 sprintf(

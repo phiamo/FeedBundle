@@ -2,6 +2,14 @@ parameters:
     mopa_feed.message_helper.class: Mopa\Bundle\FeedBundle\Model\MessageHelper
 
 services:
+    P2\Bundle\RatchetBundle\WebSocket\Server\Factory:
+        alias: p2_ratchet.websocket.server_factory
+
+    Mopa\Bundle\FeedBundle\Command\WebsocketServerCommand:
+        public: true
+        autowire: true
+        tags:
+            - {name: console.command}
     mopa_feed.message_helper:
         class: "%mopa_feed.message_helper.class%"
         lazy: true

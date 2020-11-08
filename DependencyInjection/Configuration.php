@@ -22,8 +22,8 @@ class Configuration implements ConfigurationInterface
      */
     public function getConfigTreeBuilder()
     {
-        $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('mopa_feed');
+        $treeBuilder = new TreeBuilder('mopa_feed');
+        $rootNode = $treeBuilder->getRootNode();
 
         $supportedDrivers = array('orm', 'mongodb');
         $rootNode
