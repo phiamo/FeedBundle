@@ -7,7 +7,7 @@
 
 namespace Mopa\Bundle\FeedBundle\Model;
 
-use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Persistence\ObjectManager;
 use JMS\Serializer\Serializer;
 use JMS\Serializer\SerializationContext;
 use OldSound\RabbitMqBundle\RabbitMq\Producer;

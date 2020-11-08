@@ -2,7 +2,7 @@
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 
-use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use P2\Bundle\RatchetBundle\WebSocket\Client\ClientInterface;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionManager as BaseConnectionManager;
 use P2\Bundle\RatchetBundle\WebSocket\Connection\ConnectionInterface;
@@ -16,7 +16,7 @@ use Ratchet\ConnectionInterface as SocketConnection;
 class ConnectionManager extends BaseConnectionManager
 {
     protected EncryptionHelper $encryptionHelper;
-    protected ManagerRegistry $registry;
+    protected Registry $registry;
 
     /**
      * @var Connection[][]
@@ -191,9 +191,9 @@ class ConnectionManager extends BaseConnectionManager
     }
 
     /**
-     * @param null|ManagerRegistry $registry
+     * @param Registry $registry
      */
-    public function setRegistry(ManagerRegistry $registry = null)
+    public function setRegistry(Registry $registry)
     {
         $this->registry = $registry;
     }
