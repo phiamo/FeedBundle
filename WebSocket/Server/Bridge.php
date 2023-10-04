@@ -1,4 +1,5 @@
 <?php
+
 namespace Mopa\Bundle\FeedBundle\WebSocket\Server;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
@@ -49,37 +50,28 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         $this->doctrine = $doctrine;
     }
 
-    static $lastPing = 0;
-    static $pinging = false;
     /**
      * Establish connection
      */
     private function establishConnection()
     {
-        if(self::$pinging || self::$lastPing + 10 > time() ) {
-            return;
-        }
-
-        self::$pinging = true;
         /**
          * If any timeouts in doctrine occur
          * @var \Doctrine\DBAL\Connection $connection
          */
-        foreach($this->doctrine->getConnections() as $connection) {
-            if ($connection->ping() === false) {
+        foreach ($this->doctrine->getConnections() as $connection) {
+            if ($connection->isConnected() === false) {
                 $connection->close();
                 $connection->connect();
             }
         }
 
 
-        foreach($this->doctrine->getManagers() as $name => $manager) {
+        foreach ($this->doctrine->getManagers() as $name => $manager) {
             if (method_exists($manager, 'isOpen') && !$manager->isOpen()) {
                 $this->doctrine->resetManager($name);
             }
         }
-        self::$lastPing = time();
-        self::$pinging = false;
     }
 
     /**
@@ -97,7 +89,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                 break;
             default:
                 $this->eventDispatcher->dispatch(new ConnectionEvent($connection, $payload), $payload->getEvent());
-                $this->logger->debug(sprintf('Dispatched event: %s', $payload->getEvent()).(array_key_exists('topic', $payload->getData()) ? ' for topic: '.$payload->getData()['topic'] : ''));
+                $this->logger->debug(sprintf('Dispatched event: %s', $payload->getEvent()) . (array_key_exists('topic', $payload->getData()) ? ' for topic: ' . $payload->getData()['topic'] : ''));
         }
     }
 
@@ -109,7 +101,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
      */
     protected function handleAuthentication(ConnectionInterface $connection, Payload $payload)
     {
-        if (! $this->connectionManager->authenticate($connection, $payload->getData())) {
+        if (!$this->connectionManager->authenticate($connection, $payload->getData())) {
             $connection->emit(new Payload(ConnectionEvent::SOCKET_AUTH_FAILURE, 'Invalid access token.'));
 
             $this->eventDispatcher->dispatch(new ConnectionEvent($connection), ConnectionEvent::SOCKET_AUTH_FAILURE);
@@ -161,7 +153,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
     {
         $connection = $this->connectionManager->getConnection($conn);
 
-        if($connection) {
+        if ($connection) {
             $this->eventDispatcher->dispatch(new ConnectionEvent($connection), ConnectionEvents::WEBSOCKET_CLOSE);
 
             $this->logger->notice(
@@ -171,8 +163,7 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
                     $connection->getRemoteAddress()
                 )
             );
-        }
-        else{
+        } else {
             $this->logger->log('warning', 'Could not get connection for closing', json_decode(json_encode($conn), true));
         }
 
