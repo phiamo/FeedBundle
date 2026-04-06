@@ -9,12 +9,14 @@
 namespace Mopa\Bundle\FeedBundle\Twig;
 
 use Mopa\Bundle\FeedBundle\WebSocket\Server\EncryptionHelper;
+use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
+use Twig\TwigFunction;
 
 /**
  * Class FeedExtension
  * @package Mopa\Bundle\FeedBundle\Twig
  */
-class FeedExtension extends \Twig_Extension
+class FeedExtension extends TwigExtension
 {
     /**
      * @var EncryptionHelper
@@ -36,7 +38,7 @@ class FeedExtension extends \Twig_Extension
     public function getFunctions()
     {
         return array(
-            new \Twig_SimpleFunction('mopa_feed_encrypt', array($this, 'encrypt')),
+            new TwigFunction('mopa_feed_encrypt', array($this, 'encrypt')),
         );
     }
 

@@ -4,22 +4,20 @@ namespace Mopa\Bundle\FeedBundle\Command;
 
 use Mopa\Bundle\FeedBundle\WebSocket\Server\ServerStartEvent;
 use P2\Bundle\RatchetBundle\WebSocket\Server\Factory;
-use PhpAmqpLib\Connection\Heartbeat\PCNTLHeartbeatSender;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerAwareTrait;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
-class WebsocketServerCommand extends  Command implements ContainerAwareInterface
+class WebsocketServerCommand extends Command
 {
-    use ContainerAwareTrait;
     protected static $defaultName = 'mopa:feed:websocketserver:start';
     private Factory $factory;
 
     public function __construct(
+        private ContainerInterface $container,
         Factory $factory
     )
     {
@@ -54,7 +52,7 @@ class WebsocketServerCommand extends  Command implements ContainerAwareInterface
     /**
      * {@inheritDoc}
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($output->getVerbosity() > 0) {
             $output->writeln('Verbosity: '.$output->getVerbosity());
