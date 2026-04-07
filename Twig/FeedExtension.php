@@ -9,14 +9,14 @@
 namespace Mopa\Bundle\FeedBundle\Twig;
 
 use Mopa\Bundle\FeedBundle\WebSocket\Server\EncryptionHelper;
-use Symfony\Bundle\TwigBundle\DependencyInjection\TwigExtension;
+use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 /**
  * Class FeedExtension
  * @package Mopa\Bundle\FeedBundle\Twig
  */
-class FeedExtension extends TwigExtension
+class FeedExtension extends AbstractExtension
 {
     /**
      * @var EncryptionHelper

@@ -62,7 +62,6 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         foreach ($this->doctrine->getConnections() as $connection) {
             if ($connection->isConnected() === false) {
                 $connection->close();
-                $connection->connect();
             }
         }
 
@@ -74,16 +73,6 @@ class Bridge extends \P2\Bundle\RatchetBundle\WebSocket\Server\Bridge
         }
     }
 
-
-    public function onMessage(SocketConnection $from, $msg)
-    {
-        try {
-            parent::onMessage($from, $msg);
-        } catch (\Throwable) {
-            debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
-            exit;
-        }
-    }
     /**
      * Handles the the given payload received by the given connection.
      *

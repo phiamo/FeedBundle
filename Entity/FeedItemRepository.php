@@ -22,7 +22,7 @@ class FeedItemRepository extends EntityRepository
      * @param null $indexBy
      * @return QueryBuilder
      */
-    public function createQueryBuilder($alias, $indexBy = null)
+    public function createQueryBuilder(string $alias, string|null $indexBy = null): QueryBuilder
     {
         $qb = parent::createQueryBuilder($alias, $indexBy)
             ->select($alias . ", m")
