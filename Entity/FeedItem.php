@@ -7,37 +7,33 @@
 
 namespace Mopa\Bundle\FeedBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 use Mopa\Bundle\FeedBundle\Model\FeedItem as BaseFeedItem;
-use Doctrine\ORM\Mapping as ORM;
 
-/**
- * Class FeedItem
- * @package Mopa\Bundle\FeedBundle\Entity
- * @ORM\MappedSuperclass()
- */
+#[ORM\MappedSuperclass]
 abstract class FeedItem extends BaseFeedItem
 {
     /**
      * @var \DateTime
-     *
-     * @Gedmo\Timestampable(on="create")
-     * @ORM\Column(type="datetime")
      */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
     /**
-     * @var \DateTime
-     *
-     * @Gedmo\Timestampable(on="create")
      * Only update on create automatically, otherwise this will lead to unexpected results on setting e.g. readat or adding a message
-     * @ORM\Column(type="datetime", nullable=true)
+     *
+     * @var \DateTime
      */
+    #[Gedmo\Timestampable(on: 'create')]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $updated;
 
     /**
      * @var \DateTime
-     * @ORM\Column(type="datetime", nullable=true)
      */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     protected $readAt;
 }

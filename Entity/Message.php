@@ -7,15 +7,11 @@
 
 namespace Mopa\Bundle\FeedBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Mopa\Bundle\FeedBundle\Model\Message as BaseMessage;
 
-/**
- * Class Message
- * @package Mopa\Bundle\FeedBundle\Entity
- *
- * @ORM\MappedSuperclass()
- */
+#[ORM\MappedSuperclass]
 abstract class Message extends BaseMessage
 {
     /**
@@ -27,54 +23,47 @@ abstract class Message extends BaseMessage
 
     /**
      * @var \DateTime $created
-     *
-     * @ORM\Column(type="datetime")
      */
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     protected $created;
 
     /**
      * might be set to false for certain types e.g. settings update etc, and no need to save them
      *
      * @var boolean
-     *
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $save = true;
 
     /**
      * might be set to false for certain types e.g. settings update etc, and no need to decorate them
      *
      * @var boolean
-     *
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $decorate = true;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: Types::INTEGER)]
     protected $ttl = -1;
 
     /**
      * @var integer
-     *
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: Types::INTEGER)]
     protected $hideAfter = -1;
 
     /**
      * @var string
-     *
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: Types::STRING)]
     protected $event;
 
     /**
      * @var string|array
-     *
-     * @ORM\Column(type="string")
      */
+    #[ORM\Column(type: Types::STRING)]
     protected $serializerGroup = "mopa_feed_websockets.internal";
 }

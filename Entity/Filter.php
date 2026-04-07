@@ -7,13 +7,13 @@
 
 namespace Mopa\Bundle\FeedBundle\Entity;
 
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
  * FeedFilter
- *
- * @ORM\MappedSuperclass()
  */
+#[ORM\MappedSuperclass]
 abstract class Filter
 {
     const TYPE_EXCLUDE = 0;
@@ -21,16 +21,14 @@ abstract class Filter
 
     /**
      * @var bool
-     *
-     * @ORM\Column(type="boolean")
      */
+    #[ORM\Column(type: Types::BOOLEAN)]
     protected $active = false;
 
     /**
      * @var int
-     *
-     * @ORM\Column(type="integer")
      */
+    #[ORM\Column(type: Types::INTEGER)]
     protected $type = self::TYPE_EXCLUDE;
 
     /**
